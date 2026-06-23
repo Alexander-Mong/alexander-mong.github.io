@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Governed AI Workflows — Alexander Mong</title>
+<title>Governed AI Workflows - Alexander Mong</title>
 <meta name="description" content="Deterministic rules plus a bounded LLM judge, with every finding traced to the exact words in its source and tested against a pre-registered control."/>
 <link rel="canonical" href="https://alexander-mong.github.io/projects/governed-ai-workflows/methodology.html"/>
 <meta property="og:type" content="article"/>
 <meta property="og:site_name" content="Alexander Mong Portfolio"/>
-<meta property="og:title" content="Governed AI Workflows — Alexander Mong"/>
+<meta property="og:title" content="Governed AI Workflows - Alexander Mong"/>
 <meta property="og:description" content="Deterministic rules plus a bounded LLM judge; every finding it keeps is traced to its source and tested against a pre-registered control."/>
 <meta property="og:url" content="https://alexander-mong.github.io/projects/governed-ai-workflows/methodology.html"/>
 <meta property="og:image" content="https://alexander-mong.github.io/projects/governed-ai-workflows/diagrams/division-of-labor.v3.png"/>
@@ -70,7 +70,7 @@
   Here that material is the advice given in startup and AI conference talks, about 62 hours across 153
   transcripts.</p>
 
-  <h2>Where the model decides — and where it doesn’t</h2>
+  <h2>Where the model decides, and where it doesn’t</h2>
   <p>A division of labor, so the model can only go wrong inside a boundary that ordinary software and a
   person can catch:</p>
   <figure class="diagram"><img src="diagrams/division-of-labor.v3.svg" alt="Flow: source text splits to two finders — deterministic rules and the AI building its own candidate pool (bounded reasoning); they fold together (each catches what the other misses); the model judges whether each is really advice; keepers are anchored to a verbatim quote; the traceable result marks each item as human-checked or not yet. Two side loops, both done by hand: rule gaps are refined manually, and a sample of items is human-graded to sharpen the judge."></figure>
@@ -81,8 +81,8 @@
   kept item ties back to a verbatim quote you can check against the source in seconds.</p>
 
   <h2>The controls that test it</h2>
-  <p>To test the AI’s judgment, I built a generator that throws plausible non-advice at it —
-  a rule that grabs number- and quantity-spans, never real advice — and ran 122 of its items through the
+  <p>To test the AI’s judgment, I built a generator that throws plausible non-advice at it
+  (a rule that grabs number- and quantity-spans, never real advice), and ran 122 of its items through the
   judge. The junk looked like this:</p>
   <div class="eg">
     <div class="row"><q>“they take about nine months to complete.”</q></div>
@@ -92,9 +92,9 @@
   show someone 10 things and ask them to pick no more than three.”</em>), so those 3 were arguably
   correct accepts of mislabeled junk, not misses; the set wasn’t perfectly clean, and I’d re-run it with the
   contaminants removed before leaning on the exact rate. The control I lean on harder is deterministic: every
-  kept item has to quote the source word-for-word, and anything that didn’t match was dropped — about 6%, 45 items.</p>
+  kept item has to quote the source word-for-word, and anything that didn’t match was dropped (about 6%, 45 items).</p>
   <p>And the judge has to clear a bar I fixed before testing any model: reject at least 90% of a planted
-  set of tricky non-advice. The bar is the control — anything I plug in has to pass it. The judge I’m
+  set of tricky non-advice. The bar is the control; anything I plug in has to pass it. The judge I’m
   using clears it; a candidate I tried didn’t, so it’s out.</p>
   <div class="bars">
     <div class="bar">
@@ -105,24 +105,24 @@
       <div class="lab"><span>A candidate that didn’t clear the bar</span><b>22 of 30</b></div>
       <div class="track"><div class="fill" style="width:73%;background:var(--amber)"></div><div class="thr"></div></div>
     </div>
-    <p class="note">Line = the 90% bar, fixed before testing. These are small planted sets (29 and 30 items) — enough to show the judge clears the control, not to claim it’s validated at scale. A candidate fell short, so it isn’t used.</p>
+    <p class="note">Line = the 90% bar, fixed before testing. These are small planted sets (29 and 30 items), enough to show the judge clears the control, not to claim it’s validated at scale. A candidate fell short, so it isn’t used.</p>
   </div>
-  <p class="kept"><b>691</b> advice items are in the set so far, drawn from the full corpus (not the five-transcript pilot above) — each tied to the exact passage it came from.</p>
+  <p class="kept"><b>691</b> advice items are in the set so far, drawn from the full corpus (not the five-transcript pilot above), each tied to the exact passage it came from.</p>
 
   <h2>The hard part: is it actually useful?</h2>
   <p>Telling whether something is advice is easier than telling whether it’s any good:</p>
   <div class="eg">
     <div class="row"><span class="tag">Genuinely useful</span><q>“the most underrated skill for founders is the skill to learn skills.”</q></div>
-    <div class="row"><span class="tag">Passes the filter, but empty</span><q>“So don’t do that.”</q> — grammatically advice; means nothing on its own.</div>
+    <div class="row"><span class="tag">Passes the filter, but empty</span><q>“So don’t do that.”</q> is grammatically advice, but means nothing on its own.</div>
   </div>
   <p>So I tried to grade usefulness, and this is where it broke. The clearly-low-value items separated
   cleanly from the strong ones across repeated blind passes, but ranking the ambiguous middle didn’t hold:
   an early scoring step looked clean on a small run, then fell apart on a larger one. I cut it and kept only
-  what the evidence supported — flag the clearly-low and clearly-high, leave the middle to a person.
+  what the evidence supported: flag the clearly-low and clearly-high, and leave the middle to a person.
   (Usefulness checks are from a sample.)</p>
 
   <p class="close">It’s mid-build, but the remaining work is scale-up, not invention: the full item-by-item
-  human review and the usefulness ranking come next. What already holds is the spine — every kept finding tied to its source, a junk control the
+  human review and the usefulness ranking come next. What already holds is the spine: every kept finding tied to its source, a junk control the
   judge has to clear, and a result I pulled when the evidence turned against it. The findings are public
   and source-linked; the method is laid out here.</p>
   <div style="margin:42px 0 0;padding:22px 0 0;border-top:1px solid #E7E8E5;font-size:14.5px;font-weight:650">
@@ -130,7 +130,7 @@
   </div>
 </main>
 <footer>
-  Figures and status current as of June 2026 — a work in progress. Transcripts are public (linked); my
+  Figures and status current as of June 2026; a work in progress. Transcripts are public (linked); my
   pipeline code and intermediate labels stay private. I’m glad to walk through the method in detail.
 </footer>
 </body>
