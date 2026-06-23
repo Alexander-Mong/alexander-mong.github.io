@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 652" role="img" aria-labelledby="t d" font-family="'Inter','Segoe UI',Helvetica,Arial,sans-serif">
+  <title id="t">Provenance trace — from a claim to its hashed source</title>
+  <desc id="d">A left-to-right flow tracing one confirmed finding back through five steps to a byte-exact span inside a SHA-256 hash-locked transcript. Each step names its method and version; the single LLM-judgment step is marked in cobalt. The finding text, offsets, timecode and digest shown are illustrative placeholders; the real digest stays private.</desc>
+
+  <rect x="0" y="0" width="1200" height="652" fill="#FCFCFB"/>
+
+  <text x="56" y="52" font-size="11.5" font-weight="700" letter-spacing="2.8" fill="#2747D6">PROVENANCE TRACE</text>
+  <text x="54" y="90" font-size="25" font-weight="650" fill="#17191C">From a claim to its hashed source</text>
+  <text x="56" y="115" font-size="13" fill="#5A6068">One confirmed finding, walked back — each step named and version-pinned — to a byte-exact span in a hashed source.</text>
+  <line x1="56" y1="138" x2="1144" y2="138" stroke="#E7E8E5" stroke-width="1"/>
+
+  <text x="56" y="178" font-size="10.5" font-weight="700" letter-spacing="2" fill="#2747D6">CONFIRMED FINDING · ILLUSTRATIVE PLACEHOLDER</text>
+  <text x="56" y="208" font-size="19" font-weight="600" fill="#17191C">“&lt;a single sentence of advice—sanitized placeholder&gt;”</text>
+  <text x="56" y="230" font-size="11.5" fill="#6A7079">stand-in for a real finding — the chain below shows how it resolves</text>
+
+  <line x1="140" y1="246" x2="140" y2="324" stroke="#CDD0D2" stroke-width="1.5"/>
+  <line x1="140" y1="330" x2="1080" y2="330" stroke="#CDD0D2" stroke-width="1.5"/>
+  <g fill="none" stroke="#C2C6C9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M232 325 l5 5 l-5 5"/>
+    <path d="M425 325 l5 5 l-5 5"/>
+    <path d="M618 325 l5 5 l-5 5"/>
+    <path d="M806 325 l5 5 l-5 5"/>
+    <path d="M988 325 l5 5 l-5 5"/>
+  </g>
+
+  <circle cx="140" cy="330" r="5.5" fill="#17191C"/>
+  <text x="140" y="296" font-size="10.5" font-weight="700" letter-spacing="1.3" fill="#55595F" text-anchor="middle">FINDING</text>
+  <text x="140" y="314" font-size="13.5" font-weight="600" fill="#17191C" text-anchor="middle">The claim</text>
+  <text x="140" y="358" font-size="10.5" fill="#6A7079" text-anchor="middle">the output</text>
+
+  <circle cx="330" cy="330" r="6.5" fill="#FCFCFB" stroke="#2747D6" stroke-width="2.4"/>
+  <text x="330" y="296" font-size="10.5" font-weight="700" letter-spacing="1.3" fill="#2747D6" text-anchor="middle">STAGE 4 · LLM</text>
+  <text x="330" y="314" font-size="13.5" font-weight="600" fill="#17191C" text-anchor="middle">Judged — vote only</text>
+  <text x="330" y="356" font-size="10.5" fill="#55595F" text-anchor="middle">single bounded call</text>
+  <text x="330" y="372" font-size="10" fill="#6A7079" text-anchor="middle" font-family="'SF Mono',ui-monospace,Menlo,Consolas,monospace">candidate_evaluate v1</text>
+
+  <circle cx="523" cy="330" r="4.4" fill="#6E747B"/>
+  <text x="523" y="296" font-size="10.5" font-weight="700" letter-spacing="1.3" fill="#55595F" text-anchor="middle">STAGE 3</text>
+  <text x="523" y="314" font-size="13.5" font-weight="600" fill="#17191C" text-anchor="middle">Routed by code</text>
+  <text x="523" y="356" font-size="10.5" fill="#55595F" text-anchor="middle">deduped · cost-gated</text>
+  <text x="523" y="372" font-size="10" fill="#6A7079" text-anchor="middle" font-family="'SF Mono',ui-monospace,Menlo,Consolas,monospace">cand_&lt;id&gt;</text>
+
+  <circle cx="715" cy="330" r="4.4" fill="#6E747B"/>
+  <text x="715" y="296" font-size="10.5" font-weight="700" letter-spacing="1.3" fill="#55595F" text-anchor="middle">STAGE 2</text>
+  <text x="715" y="314" font-size="13.5" font-weight="600" fill="#17191C" text-anchor="middle">Versioned rule</text>
+  <text x="715" y="356" font-size="10.5" fill="#55595F" text-anchor="middle">named · reproducible</text>
+  <text x="715" y="372" font-size="10" fill="#6A7079" text-anchor="middle" font-family="'SF Mono',ui-monospace,Menlo,Consolas,monospace">rule_&lt;name&gt; v2</text>
+
+  <circle cx="900" cy="330" r="4.4" fill="#6E747B"/>
+  <text x="900" y="296" font-size="10.5" font-weight="700" letter-spacing="1.3" fill="#55595F" text-anchor="middle">STAGE 1</text>
+  <text x="900" y="314" font-size="13.5" font-weight="600" fill="#17191C" text-anchor="middle">Exact span</text>
+  <text x="900" y="356" font-size="10.5" fill="#55595F" text-anchor="middle">offsets + timecode</text>
+  <text x="900" y="372" font-size="10" fill="#6A7079" text-anchor="middle" font-family="'SF Mono',ui-monospace,Menlo,Consolas,monospace">[NNNNN–NNNNN] · HH:MM:SS</text>
+
+  <circle cx="1080" cy="330" r="6.5" fill="#2747D6"/>
+  <text x="1080" y="296" font-size="10.5" font-weight="700" letter-spacing="1.3" fill="#17191C" text-anchor="middle">SOURCE</text>
+  <text x="1080" y="314" font-size="13.5" font-weight="600" fill="#17191C" text-anchor="middle">Hash-locked</text>
+  <text x="1080" y="356" font-size="10.5" fill="#55595F" text-anchor="middle">SHA-256 pinned</text>
+  <text x="1080" y="372" font-size="10" fill="#6A7079" text-anchor="middle" font-family="'SF Mono',ui-monospace,Menlo,Consolas,monospace">transcript</text>
+
+  <rect x="56" y="432" width="1088" height="42" rx="8" fill="#1F242B"/>
+  <text x="80" y="458" font-size="10.5" font-weight="700" letter-spacing="1.6" fill="#8FA0C9">HASHED SOURCE · ILLUSTRATIVE DIGEST</text>
+  <text x="318" y="458" font-size="12.5" fill="#E9EEF3" font-family="'SF Mono',ui-monospace,Menlo,Consolas,monospace">sha256  0000illustrative0000…not-a-real-digest…0000</text>
+
+  <path d="M58 524 l5 6 l11 -14" fill="none" stroke="#2747D6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="86" y="527" font-size="13.5" font-weight="600" fill="#17191C">Byte-for-byte match — the text at [NNNNN–NNNNN] equals the finding above.</text>
+  <text x="86" y="548" font-size="12" font-style="italic" fill="#6A7079">A claim with a receipt, not an assertion.</text>
+
+  <text x="56" y="616" font-size="10.5" letter-spacing="0.2" fill="#9AA0A6">Deterministic code moves, anchors, counts, and routes   ·   the LLM casts one bounded vote   ·   a human reviews and can overrule</text>
+</svg>

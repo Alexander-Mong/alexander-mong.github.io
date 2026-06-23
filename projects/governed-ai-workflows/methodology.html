@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Governed AI Workflows — Alexander Mong</title>
+<meta name="description" content="Deterministic rules plus a bounded LLM judge, with every finding traced to the exact words in its source and tested against a pre-registered control."/>
+<link rel="canonical" href="https://alexander-mong.github.io/projects/governed-ai-workflows/methodology.html"/>
+<meta property="og:type" content="article"/>
+<meta property="og:site_name" content="Alexander Mong Portfolio"/>
+<meta property="og:title" content="Governed AI Workflows — Alexander Mong"/>
+<meta property="og:description" content="Deterministic rules plus a bounded LLM judge; every finding it keeps is traced to its source and tested against a pre-registered control."/>
+<meta property="og:url" content="https://alexander-mong.github.io/projects/governed-ai-workflows/methodology.html"/>
+<meta property="og:image" content="https://alexander-mong.github.io/projects/governed-ai-workflows/diagrams/division-of-labor.v3.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://alexander-mong.github.io/projects/governed-ai-workflows/diagrams/division-of-labor.v3.png"/>
+<style>
+  :root { --ink:#17191C; --soft:#2A2D31; --muted:#55595F; --faint:#6A7079; --line:#E7E8E5; --track:#EDEFF1; --bg:#FCFCFB; --cobalt:#2747D6; --amber:#B45309; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:Inter,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.66; -webkit-font-smoothing:antialiased; }
+  main { max-width:680px; margin:0 auto; padding:72px 24px 64px; }
+  .kicker { color:var(--cobalt); font-weight:700; font-size:12px; letter-spacing:.16em; text-transform:uppercase; margin:0 0 14px; }
+  h1 { font-size:31px; line-height:1.18; font-weight:680; letter-spacing:-.02em; margin:0 0 20px; }
+  .lead { font-size:18.5px; line-height:1.6; color:var(--soft); margin:0 0 6px; }
+  h2 { font-size:17px; font-weight:700; margin:42px 0 12px; letter-spacing:-.005em; }
+  p { margin:0 0 16px; color:var(--soft); }
+  ul.body { margin:0 0 4px; padding:0; list-style:none; }
+  ul.body li { position:relative; padding-left:20px; margin:0 0 10px; color:var(--soft); }
+  ul.body li::before { content:""; position:absolute; left:2px; top:11px; width:5px; height:5px; border-radius:50%; background:var(--cobalt); }
+  ul.body li b { color:var(--ink); font-weight:650; }
+  .split { width:100%; max-width:980px; margin:18px auto; display:flex; gap:32px; align-items:center; }
+  .split .txt { flex:1 1 0; min-width:0; }
+  .split .fig { flex:0 0 330px; }
+  .split .fig img { width:100%; height:auto; display:block; }
+  @media (max-width:760px){ .split { flex-direction:column; gap:16px; } .split .fig { flex:none; width:100%; max-width:380px; } }
+  .diagram { margin:26px calc(50% - 50vw) 12px; text-align:center; }
+  .diagram img { width:92%; max-width:740px; height:auto; display:inline-block; }
+  .eg { border-left:3px solid var(--line); padding:2px 0 2px 16px; margin:0 0 16px; }
+  .eg .row { margin:0 0 9px; } .eg .row:last-child { margin:0; }
+  .eg .tag { display:block; font-size:11.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--faint); margin-bottom:2px; }
+  .eg q { color:var(--ink); font-style:italic; }
+  .bars { margin:16px 0 8px; max-width:520px; }
+  .bar { margin:0 0 13px; }
+  .bar .lab { display:flex; justify-content:space-between; align-items:baseline; font-size:13.5px; color:var(--muted); margin-bottom:6px; }
+  .bar .lab b { color:var(--ink); font-weight:650; }
+  .bar .track { position:relative; height:9px; background:var(--track); border-radius:5px; }
+  .bar .fill { height:100%; border-radius:5px; }
+  .bar .thr { position:absolute; top:-4px; bottom:-4px; left:90%; width:2px; background:#17191C; box-shadow:0 0 0 1px rgba(255,255,255,.75); }
+  .bars .note { font-size:12px; color:var(--faint); margin:2px 0 0; }
+  .kept { font-size:14px; color:var(--ink); margin:6px 0 0; } .kept b { font-weight:700; }
+  .close { margin-top:40px; padding-top:24px; border-top:1px solid var(--line); color:var(--ink); font-size:17px; }
+  .next { margin:14px 0 0; }
+  .next a { color:var(--cobalt); font-weight:650; font-size:15.5px; text-decoration:none; border-bottom:1px solid transparent; }
+  .next a:hover { border-bottom-color:var(--cobalt); }
+  footer { max-width:680px; margin:0 auto; padding:8px 24px 72px; color:var(--faint); font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+  <nav aria-label="Governed AI Workflows section" style="margin:0 0 22px;font-size:13px;font-weight:600;line-height:1.9">
+    <a href="../../tech-week-advice.html" style="color:#2747D6;text-decoration:none">&larr; Advice &amp; predictions</a><span style="color:#C9CCCF;margin:0 9px">&middot;</span><span style="color:#6A7079">The method</span>
+  </nav>
+  <p class="kicker">Governed AI Workflows</p>
+  <h1>Most AI text analysis can’t be traced back. This one traces every finding it keeps to its source.</h1>
+
+  <p class="lead">The usual approach hands a model a pile of text and asks it to summarize, and you have
+  no way to know what it made up or what it left out. I work the other way around. What’s on display here
+  isn’t a model; it’s the controls you’d put around an AI workflow before trusting its output: every
+  finding tied to the exact words in its source, and anything that doesn’t match the source thrown out.
+  Here that material is the advice given in startup and AI conference talks, about 62 hours across 153
+  transcripts.</p>
+
+  <h2>Where the model decides — and where it doesn’t</h2>
+  <p>A division of labor, so the model can only go wrong inside a boundary that ordinary software and a
+  person can catch:</p>
+  <figure class="diagram"><img src="diagrams/division-of-labor.v3.svg" alt="Flow: source text splits to two finders — deterministic rules and the AI building its own candidate pool (bounded reasoning); they fold together (each catches what the other misses); the model judges whether each is really advice; keepers are anchored to a verbatim quote; the traceable result marks each item as human-checked or not yet. Two side loops, both done by hand: rule gaps are refined manually, and a sample of items is human-graded to sharpen the judge."></figure>
+
+  <p>The two finders catch different things. On a five-transcript pilot (a slice, with the full corpus
+  still ahead), the AI’s pass turned up about as many advice passages again as the rules had, nearly all
+  phrased in ways the rules’ patterns couldn’t reach. Folding the two found more than either alone. Every
+  kept item ties back to a verbatim quote you can check against the source in seconds.</p>
+
+  <h2>The controls that test it</h2>
+  <p>To test the AI’s judgment, I built a generator that throws plausible non-advice at it —
+  a rule that grabs number- and quantity-spans, never real advice — and ran 122 of its items through the
+  judge. The junk looked like this:</p>
+  <div class="eg">
+    <div class="row"><q>“they take about nine months to complete.”</q></div>
+    <div class="row"><q>“roughly a million tokens in its context limit.”</q></div>
+  </div>
+  <p>It accepted 3. Looking at them, the generator had accidentally grabbed real advice (e.g. <em>“Don’t
+  show someone 10 things and ask them to pick no more than three.”</em>), so those 3 were arguably
+  correct accepts of mislabeled junk, not misses; the set wasn’t perfectly clean, and I’d re-run it with the
+  contaminants removed before leaning on the exact rate. The control I lean on harder is deterministic: every
+  kept item has to quote the source word-for-word, and anything that didn’t match was dropped — about 6%, 45 items.</p>
+  <p>And the judge has to clear a bar I fixed before testing any model: reject at least 90% of a planted
+  set of tricky non-advice. The bar is the control — anything I plug in has to pass it. The judge I’m
+  using clears it; a candidate I tried didn’t, so it’s out.</p>
+  <div class="bars">
+    <div class="bar">
+      <div class="lab"><span>The judge in use</span><b>28 of 29</b></div>
+      <div class="track"><div class="fill" style="width:96.6%;background:var(--cobalt)"></div><div class="thr"></div></div>
+    </div>
+    <div class="bar">
+      <div class="lab"><span>A candidate that didn’t clear the bar</span><b>22 of 30</b></div>
+      <div class="track"><div class="fill" style="width:73%;background:var(--amber)"></div><div class="thr"></div></div>
+    </div>
+    <p class="note">Line = the 90% bar, fixed before testing. These are small planted sets (29 and 30 items) — enough to show the judge clears the control, not to claim it’s validated at scale. A candidate fell short, so it isn’t used.</p>
+  </div>
+  <p class="kept"><b>691</b> advice items are in the set so far, drawn from the full corpus (not the five-transcript pilot above) — each tied to the exact passage it came from.</p>
+
+  <h2>The hard part: is it actually useful?</h2>
+  <p>Telling whether something is advice is easier than telling whether it’s any good:</p>
+  <div class="eg">
+    <div class="row"><span class="tag">Genuinely useful</span><q>“the most underrated skill for founders is the skill to learn skills.”</q></div>
+    <div class="row"><span class="tag">Passes the filter, but empty</span><q>“So don’t do that.”</q> — grammatically advice; means nothing on its own.</div>
+  </div>
+  <p>So I tried to grade usefulness, and this is where it broke. The clearly-low-value items separated
+  cleanly from the strong ones across repeated blind passes, but ranking the ambiguous middle didn’t hold:
+  an early scoring step looked clean on a small run, then fell apart on a larger one. I cut it and kept only
+  what the evidence supported — flag the clearly-low and clearly-high, leave the middle to a person.
+  (Usefulness checks are from a sample.)</p>
+
+  <p class="close">It’s mid-build, but the remaining work is scale-up, not invention: the full item-by-item
+  human review and the usefulness ranking come next. What already holds is the spine — every kept finding tied to its source, a junk control the
+  judge has to clear, and a result I pulled when the evidence turned against it. The findings are public
+  and source-linked; the method is laid out here.</p>
+  <div style="margin:42px 0 0;padding:22px 0 0;border-top:1px solid #E7E8E5;font-size:14.5px;font-weight:650">
+    <a href="../../tech-week-advice.html" style="color:#2747D6;text-decoration:none">&larr; Back to the advice &amp; predictions</a><span style="color:#C9CCCF;margin:0 12px">&middot;</span><a href="mailto:alexandermong@gmail.com" style="color:#2747D6;text-decoration:none">Email me &rarr;</a>
+  </div>
+</main>
+<footer>
+  Figures and status current as of June 2026 — a work in progress. Transcripts are public (linked); my
+  pipeline code and intermediate labels stay private. I’m glad to walk through the method in detail.
+</footer>
+</body>
+</html>
