@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Supply-Chain Evidence Agent — a governed agent on CRAFT</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --panel:#ffffff; --panel2:#f8fafc; --line:#dbe1ea; --ink:#0f172a; --muted:#475569; --faint:#7b8aa3;
+    --answer:#15803d; --answer-bg:#dcfce7; --qual:#b45309; --qual-bg:#fef3c7;
+    --esc:#6d28d9; --esc-bg:#ede9fe; --gold:#a16207; --gold-bg:#fefce8; --danger:#dc2626;
+    --mono:"SF Mono",Consolas,"Roboto Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:34px 26px 70px}
+  a{color:var(--esc);text-decoration:none;font-weight:700}
+  /* hero */
+  .hero{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:30px}
+  .eyebrow{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--esc)}
+  h1{font-size:42px;font-weight:800;letter-spacing:-.015em;margin:8px 0 6px}
+  .tagline{font-size:19px;color:var(--muted);margin:0 0 18px;max-width:820px}
+  .thesis{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--esc);border-radius:12px;
+          padding:16px 20px;font-size:16.5px;color:#1e293b;max-width:900px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+  .thesis b{color:var(--ink)}
+  .cta{display:inline-flex;gap:8px;align-items:center;margin-top:18px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:15px}
+  .cta.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);margin-left:10px}
+  h2{font-size:24px;font-weight:800;margin:38px 0 6px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 18px}
+  /* diagram */
+  .diagram{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(15,23,42,.06);overflow-x:auto}
+  .diagram img{display:block;width:100%;height:auto;min-width:900px}
+  /* how it works */
+  .how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .how .h{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .how .h .n{font-family:var(--mono);font-weight:800;font-size:14px;color:var(--esc)}
+  .how .h p{margin:6px 0 0;font-size:14.5px;color:#334155}
+  .how .h b{color:var(--ink)}
+  /* cards */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--line);border-radius:14px;
+        padding:18px 20px 20px;box-shadow:0 2px 6px rgba(15,23,42,.06)}
+  .card.answer{border-top-color:var(--answer)}
+  .card.qualified{border-top-color:var(--qual)}
+  .card.escalate{border-top-color:var(--esc);box-shadow:0 4px 16px rgba(109,40,217,.18)}
+  .card.money{grid-column:1/-1;border-top-width:6px}
+  .badge{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.04em;padding:4px 11px;border-radius:999px;color:#fff}
+  .badge-answer{background:var(--answer)} .badge-qualified{background:var(--qual)} .badge-escalate{background:var(--esc)}
+  .card h3{font-size:19px;font-weight:800;margin:12px 0 10px}
+  .finding{font-size:20px;font-weight:800;margin:0 0 8px;color:var(--ink)}
+  .card.answer .finding{color:#14532d} .card.qualified .finding{color:#7c2d12} .card.escalate .finding{color:#4c1d95}
+  .note{font-size:14px;color:var(--muted);margin:0 0 12px;font-style:italic}
+  .card.qualified .note{color:#92400e;font-style:normal;font-weight:600;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:9px 11px}
+  pre.receipt{font-family:var(--mono);font-size:12.5px;background:#0b122412;color:#0f172a;border-radius:8px;
+        padding:10px 12px;margin:0;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;line-height:1.5}
+  .card.escalate pre.receipt{background:#f5f3ff;color:#4c1d95}
+  .headtohead{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+  .headtohead .label{font-size:12.5px;font-weight:700;color:var(--muted)}
+  .headtohead .foil{margin:6px 0 0;font-size:15px;font-weight:600;color:#7f1d1d;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:9px 12px}
+  .headtohead .foil strong{color:var(--danger)}
+  /* multi-model sweep (the fair head-to-head) */
+  .headtohead-sweep{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+  .sweep-head{font-size:13.5px;font-weight:700;color:var(--muted)}
+  .sweep-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:11px 0 4px}
+  .guess{font-family:var(--mono);font-size:14px;background:#f1f5f9;color:#475569;border:1px solid var(--line);border-radius:7px;padding:4px 11px}
+  .grounded-pill{font-family:var(--mono);font-size:14px;font-weight:800;background:var(--answer-bg);color:#14532d;border:1px solid #86efac;border-radius:7px;padding:4px 12px;margin-left:4px}
+  .sweep-note{font-size:14px;color:#334155;margin:9px 0 0;line-height:1.5}
+  .sweep-note b{color:var(--ink)}
+  .versus{display:flex;gap:16px;align-items:stretch;flex-wrap:wrap}
+  .versus .side{flex:1;min-width:280px}
+  .backups{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .backup{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;font-size:14px}
+  .backup .b-badge{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.05em}
+  .backup b{color:var(--ink)}
+  .backup .q{color:#334155} .backup em{color:var(--muted)}
+  /* framing */
+  .framing{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .framing .f{background:var(--esc-bg);border:1px solid #ddd6fe;border-radius:12px;padding:15px 17px;font-size:14.5px;color:#4c1d95}
+  .framing .f b{color:#3b0764}
+  /* honesty — a trust signal, kept prominent */
+  .honesty{background:#f8fafc;color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:26px 28px;margin-top:14px}
+  .honesty h2{margin:0 0 4px}
+  .honesty .sub{color:var(--muted);margin-bottom:18px}
+  .honesty .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .honesty .item{background:#fff;border:1px solid var(--line);border-radius:11px;padding:15px 17px}
+  .honesty .item .k{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--esc)}
+  .honesty .item p{margin:6px 0 0;font-size:14.5px;color:#334155}
+  .honesty .item .stat{font-size:26px;font-weight:800;font-family:var(--mono);color:var(--answer)}
+  .honesty .item b{color:var(--ink)}
+  /* footer */
+  .foot{margin-top:34px;border-top:1px solid var(--line);padding-top:20px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  .cmd{font-family:var(--mono);font-size:14px;background:#0f172a;color:#e6ecf7;padding:11px 16px;border-radius:10px}
+  .foot .src{font-size:13px;color:var(--faint)}
+  @media (max-width:860px){.how,.framing,.honesty .grid,.cards,.backups{grid-template-columns:1fr}h1{font-size:32px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">Enterprise Agents Hackathon · Emergence CRAFT + Nebius</div>
+    <h1>Supply-Chain Evidence Agent</h1>
+    <p class="tagline">Ask in plain English. It gathers auditable evidence, grades its own confidence, and defers to a human when it can't be sure.</p>
+    <div class="thesis">The agent turns a plain-English question into SQL through CRAFT, grades how much confidence the evidence actually supports, and attaches a receipt — the query and its rows — to every answer. When the data can't support an answer, it says so and defers to a person.</div>
+    <div>
+      <a class="cta" href="trace_console.html">Open the interactive demo</a>
+      <a class="cta ghost" href="#honesty">Limitations &amp; disclosures ↓</a>
+    </div>
+  </div>
+
+  <!-- DIAGRAM -->
+  <h2>How the agent decides</h2>
+  <p class="sub">REQUEST → gather evidence (CRAFT) → grade confidence → <b>ANSWER · QUALIFIED · ESCALATE</b>. Every path ships a receipt; the human decides.</p>
+  <div class="diagram"><img src="pitch_decision_flow.svg" alt="Evidence-flow diagram: request → gather evidence via CRAFT → grade confidence into ANSWER, QUALIFIED, or ESCALATE, every path shipping a receipt"/></div>
+
+  <!-- HOW IT WORKS -->
+  <h2>In three lines</h2>
+  <div class="how">
+    <div class="h"><div class="n">01 · EVIDENCE</div><p><b>CRAFT</b> turns the question into SQL and runs it — and states its own assumptions.</p></div>
+    <div class="h"><div class="n">02 · GRADE</div><p>Our thin layer reads those assumptions and grades confidence on <b>3 tiers</b>: ANSWER · QUALIFIED · ESCALATE.</p></div>
+    <div class="h"><div class="n">03 · RECEIPT</div><p>Every answer ships a <b>receipt</b> (SQL + rows). The agent gathers evidence; <b>the human decides.</b></p></div>
+  </div>
+
+  <!-- CARDS -->
+  <h2>The demo — real frozen cards</h2>
+  <p class="sub">All values are taken verbatim from a live capture (<span style="font-family:var(--mono)">decisions_frozen.json</span>).</p>
+  <div class="cards">
+
+    <!-- MONEY CARD: grounded answer vs the model field -->
+    <div class="card answer money">
+      <span class="badge badge-answer">ANSWER</span>
+      <h3>How many CRITICAL advisories reference jackson-databind?</h3>
+      <p class="finding">23 CRITICAL advisories in this dataset reference jackson-databind.</p>
+      <p class="note">Auditable evidence for a human to weigh — not a ship/don't-ship verdict.</p>
+      <pre class="receipt">SELECT COUNT(DISTINCT a."SourceID") FROM ...ADVISORIES  →  23</pre>
+      <div class="headtohead-sweep">
+        <div class="sweep-head">The same question, asked of 25 models on Nebius Token Factory — ungrounded, with a neutral prompt:</div>
+        <div class="sweep-row">
+          <span class="guess">0</span><span class="guess">3</span><span class="guess">6</span><span class="guess">9</span><span class="guess">10</span><span class="guess">20</span><span class="guess">30</span><span class="guess">60</span><span class="guess">80</span><span class="guess">100</span>
+          <span class="grounded-pill">grounded agent → 23, with the SQL</span>
+        </div>
+        <p class="sweep-note">The answers scatter from 0 to 100; <b>none returned 23</b>, and none could show the query behind its number. A few, verbatim: Llama-3.3-70B "over 60", DeepSeek-V4-Pro "over 80", Qwen3-235B "over 30"; several returned no answer. Neutral prompt, 25 models — a fair comparison, not a single hand-picked one.</p>
+      </div>
+    </div>
+
+    <!-- ESCALATE -->
+    <div class="card escalate">
+      <span class="badge badge-escalate">ESCALATE → HUMAN</span>
+      <h3>Black-market price of a zero-day for struts2?</h3>
+      <p class="finding">Can't answer this from the data — it isn't in this dataset.</p>
+      <p class="note">Routed to a human. The agent asserts nothing it can't stand behind.</p>
+      <pre class="receipt">(no query, no rows — nothing fabricated)</pre>
+    </div>
+
+    <!-- QUALIFIED -->
+    <div class="card qualified">
+      <span class="badge badge-qualified">QUALIFIED — caveat</span>
+      <h3>Average CVSS exploitability score?</h3>
+      <p class="finding">Closest available answer: 7.16.</p>
+      <p class="note">CAVEAT — CRAFT flagged this as "approximate"; may not be the exact metric asked for. A human confirms before relying on it.</p>
+      <pre class="receipt">SELECT AVG("CVSS3Score") AS AVG_CVSS_EXPLOITABILITY_SCORE ...  →  7.16 (base score, not exploitability)</pre>
+    </div>
+
+  </div>
+
+  <!-- BACKUPS -->
+  <h2 style="font-size:18px">Backup cards</h2>
+  <div class="backups">
+    <div class="backup">
+      <div class="b-badge">ANSWER · absence — commons-lang3</div>
+      <p class="q"><b>"No CRITICAL advisories found for commons-lang3 in this dataset."</b> (rows <span style="font-family:var(--mono)">0</span>)</p>
+      <em>Absence of evidence, NOT a clean bill of health — the human decides.</em>
+    </div>
+    <div class="backup">
+      <div class="b-badge">ESCALATE · scraped — moby maintainer email</div>
+      <p class="q">Returns <span style="font-family:var(--mono)">security@docker.com</span> scraped from free text, but CRAFT noted it "does not have" a structured field for this → <b>defers</b>.</p>
+      <em>An unverified value pulled from free text is treated as unverified, not as a confirmed fact.</em>
+    </div>
+  </div>
+
+  <!-- FRAMING -->
+  <h2>Design principles</h2>
+  <div class="framing">
+    <div class="f"><b>CRAFT is honest</b> — it states its own assumptions. Our layer <b>leverages</b> that to grade confidence and escalate.</div>
+    <div class="f">The agent is an <b>evidence-gatherer</b>, not an oracle. <b>The human decides.</b></div>
+    <div class="f"><b>Reproducible + dataset-agnostic</b> — same every time (replayed from a live capture); repoints to any of the 9 datasets.</div>
+  </div>
+
+  <!-- HONESTY DISCLOSURES -->
+  <div class="honesty" id="honesty">
+    <h2>Limitations &amp; disclosures</h2>
+    <p class="sub">We measured the shipped system's limits and list them here so they can be weighed alongside the results.</p>
+    <div class="grid">
+      <div class="item">
+        <div class="k">Self-measured coverage</div>
+        <div class="stat">42%</div>
+        <p>On <b>119 synthetic traps</b>, the shipped heuristic gate catches 42% (~2% false-abstain). We measured where it misses.</p>
+      </div>
+      <div class="item">
+        <div class="k">Classifier</div>
+        <p>A <b>simple heuristic v1</b> over CRAFT's assumptions — disclosed. Robust <em>because</em> it's 3-tier: a miss degrades to a <b>caveat</b>, not a wrong refusal.</p>
+      </div>
+      <div class="item">
+        <div class="k">LLM auditor</div>
+        <p>We tested <b>nemotron-3-super</b> as an auditor — it <b>flip-flopped</b> on the CVSS case between identical runs. So the backbone is <b>deterministic</b>; any LLM is a second opinion, never the gate.</p>
+      </div>
+      <div class="item">
+        <div class="k">Demo integrity</div>
+        <p><b>Replayed from a live capture</b> (deterministic) — not implied-live. Runs identically every time, offline.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    <div>
+      <div class="cmd">python decision_demo.py</div>
+      <div class="src" style="margin-top:8px">deterministic · offline · source: spider_agent/decisions_frozen.json</div>
+    </div>
+    <a class="cta" href="trace_console.html">Open the interactive demo</a>
+  </div>
+
+</div>
+</body>
+</html>

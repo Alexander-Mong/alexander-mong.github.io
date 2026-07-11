@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Governed vs Ungoverned — live head-to-head</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --ink:#0f172a; --muted:#64748b; --card:#ffffff; --line:#e2e8f0;
+    --draft:#7c3aed; --execute:#1d4ed8; --verify:#15803d; --debug:#b45309; --answer:#a16207;
+    --bad:#dc2626; --bad-bg:#fef2f2; --gold-bg:#fefce8; --good-bg:#f0fdf4; --tool-bg:#f8fafc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Segoe UI",system-ui,-apple-system,sans-serif;padding:22px 26px 60px}
+  h1{font-size:30px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 16px}
+  .askbar{display:flex;gap:10px;max-width:1180px}
+  #q{flex:1;font-size:18px;padding:14px 16px;border:2px solid var(--line);border-radius:12px;background:#fff}
+  #q:focus{outline:none;border-color:var(--execute)}
+  button{font-size:17px;font-weight:700;padding:14px 22px;border:none;border-radius:12px;cursor:pointer}
+  #run{background:var(--ink);color:#fff}
+  #reset{background:#e2e8f0;color:var(--ink)}
+  button:disabled{opacity:.5;cursor:default}
+  .chips{margin:12px 0 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chips .lbl{color:var(--muted);font-size:13px;margin-right:4px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;cursor:pointer}
+  .chip:hover{border-color:var(--execute);color:var(--execute)}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  .lg{font-weight:700;color:#fff;padding:2px 8px;border-radius:5px;font-size:11px}
+  .lg.d{background:var(--draft)} .lg.e{background:var(--execute)} .lg.v{background:var(--verify)}
+  .lg.g{background:var(--debug)} .lg.a{background:var(--answer)}
+  .legend .sep{opacity:.5}
+  .note{margin:8px 0 20px;font-size:12.5px;color:var(--muted);max-width:1180px;line-height:1.5}
+  .note b{color:var(--answer)}
+  .panels{display:flex;gap:22px;align-items:flex-start}
+  .panel{flex:1;min-width:0;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px 20px 22px}
+  .panel.ung{border-color:#fca5a5} .panel.gov{border-color:#86efac}
+  .phead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .phead h2{font-size:22px;margin:0}
+  .panel.ung h2{color:var(--bad)} .panel.gov h2{color:var(--verify)}
+  .ptag{font-size:12px;color:var(--muted)}
+  /* pipeline stepper */
+  .pipe{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:12px 0 4px;min-height:30px}
+  .pnode{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;border:2px solid var(--line);
+         background:#fff;color:#475569;white-space:nowrap}
+  .pnode.ph-draft{border-color:var(--draft);color:var(--draft)}
+  .pnode.ph-execute{border-color:var(--execute);color:var(--execute)}
+  .pnode.ph-verify{border-color:var(--verify);color:var(--verify)}
+  .pnode.ph-answer{border-color:var(--answer);color:var(--answer)}
+  .pnode.ph-abstain{border-color:var(--debug);color:var(--debug)}
+  .pnode.skip{border-style:dashed;border-color:#cbd5e1;color:#94a3b8;text-decoration:line-through}
+  .pnode .loop{font-weight:800;color:var(--verify)} .pnode .skiplbl{font-weight:600;text-decoration:none;font-size:10px}
+  .parrow{color:#cbd5e1;font-weight:700}
+  /* timeline spine + dots */
+  .timeline{position:relative;margin-top:12px;padding-left:26px;display:flex;flex-direction:column;gap:11px;min-height:50px}
+  .timeline::before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:var(--line)}
+  .step{position:relative;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 13px;
+        box-shadow:0 1px 2px rgba(15,23,42,.05);opacity:0;transform:translateY(6px);
+        transition:opacity .35s ease, transform .35s ease}
+  .step.show{opacity:1;transform:none}
+  .step::before{content:"";position:absolute;left:-23px;top:14px;width:15px;height:15px;border-radius:50%;
+        background:#fff;border:3px solid var(--line);box-shadow:0 0 0 3px #fff}
+  .step.ph-draft::before{border-color:var(--draft)} .step.ph-execute::before{border-color:var(--execute)}
+  .step.ph-verify::before{border-color:var(--verify)} .step.ph-debug::before{border-color:var(--debug)}
+  .step.ph-answer::before{border-color:var(--answer)}
+  .step.gate{background:var(--good-bg);border-color:#bbf7d0}
+  .step.gate.rej{background:#fffbeb;border-color:#fde68a}
+  .step.bad{background:var(--bad-bg);border-color:#fecaca}
+  .step .t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ph{font-size:10px;font-weight:800;letter-spacing:.05em;padding:2px 6px;border-radius:5px;color:#fff}
+  .ph.ph-draft{background:var(--draft)} .ph.ph-execute{background:var(--execute)}
+  .ph.ph-verify{background:var(--verify)} .ph.ph-debug{background:var(--debug)} .ph.ph-answer{background:var(--answer)}
+  .step .ttl{font-weight:700;font-size:14.5px}
+  .step .spacer{flex:1}
+  .stat{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .stat.ok{background:#dcfce7;color:#14532d} .stat.wrong{background:#fee2e2;color:#991b1b}
+  .stat.warn{background:#fef3c7;color:#92400e} .stat.rej{background:#fef3c7;color:#92400e}
+  .stat.fix{background:#dbeafe;color:#1e40af}
+  .ms{font-size:11px;color:#94a3b8;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .subtag{font-size:11px;color:var(--muted);margin-top:2px}
+  .step .b{font-size:13px;color:#334155;margin-top:6px;line-height:1.45}
+  .step .call{font-family:Consolas,monospace;font-size:11.5px;color:#475569;margin-top:6px;word-break:break-word}
+  .step pre.code{font-family:Consolas,monospace;font-size:12px;background:#0f172a0d;color:#1e293b;
+        padding:8px 10px;border-radius:6px;white-space:pre-wrap;overflow-x:auto;margin:6px 0 0;line-height:1.5}
+  .step pre.out{background:#0f172a08;color:#334155}
+  .ins{background:#dcfce7;color:#14532d;border-radius:3px;padding:0 3px;font-weight:700}
+  .del{background:#fee2e2;color:#991b1b;border-radius:3px;padding:0 3px;text-decoration:underline wavy #dc2626}
+  .diffcap{margin-top:6px;font-size:11.5px;font-weight:700}
+  .diffcap .d1{color:#991b1b;text-decoration:line-through} .diffcap .d2{color:#14532d}
+  .step ul.assump{margin:6px 0 0 2px;padding:0 0 0 16px;font-size:12px;color:#334155;line-height:1.45}
+  .step ul.assump li{margin:2px 0}
+  .step .n{font-size:12px;margin-top:6px;font-style:italic}
+  .step.bad .n{color:var(--bad)} .step.gate .n{color:var(--verify)} .step.gate.rej .n{color:var(--debug)}
+  table.res{border-collapse:collapse;font-size:12.5px;margin:8px 0 2px}
+  table.res th,table.res td{border:1px solid var(--line);padding:4px 12px;text-align:left}
+  table.res th{background:#f1f5f9;font-weight:700}
+  table.res td:last-child,table.res th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+  .verdict{margin-top:16px;border-radius:12px;padding:14px 16px;opacity:0;transition:opacity .4s;font-size:15px}
+  .verdict.show{opacity:1}
+  .verdict.wrong{background:var(--bad-bg);border:2px solid var(--bad)}
+  .verdict.abstain{background:var(--gold-bg);border:2px solid var(--debug)}
+  .verdict.receipt{background:var(--gold-bg);border:2px solid var(--answer)}
+  .scorecard{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .sc{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .sc.good{background:#dcfce7;color:#14532d} .sc.bad{background:#fee2e2;color:#991b1b}
+  .sc.warn{background:#fef3c7;color:#92400e} .sc.info{background:#dbeafe;color:#1e40af} .sc.neutral{background:#e2e8f0;color:#334155}
+  .verdict .big{font-size:20px;font-weight:800}
+  .verdict.wrong .big{color:#991b1b} .verdict.abstain .big{color:#854d0e} .verdict.receipt .big{color:#854d0e}
+  .verdict .why{font-size:13px;color:#334155;margin-top:8px;line-height:1.45}
+  .receiptbox{margin-top:10px;font-family:Consolas,monospace;font-size:12px;color:#422006;line-height:1.7;
+        border-top:1px dashed #d6ad4e;padding-top:8px}
+  .receiptbox .k{color:#a16207;font-weight:700}
+  @media (max-width:880px){.panels{flex-direction:column}}
+</style>
+</head>
+<body>
+  <h1>Governed vs Ungoverned — a live head-to-head</h1>
+  <p class="sub">Type a question. Two agents run the same task. Follow the full trace — every phase, tool call, result, and check — and watch one catch a wrong answer before it's spoken.</p>
+
+  <div class="askbar">
+    <input id="q" placeholder="Ask about open-source supply-chain risk…" value="Which Maven packages have the most CRITICAL advisories?"/>
+    <button id="run">Run ▶</button>
+    <button id="reset">Reset</button>
+  </div>
+  <div class="chips">
+    <span class="lbl">Try:</span>
+    <span class="chip" data-k="maven-critical">Maven · most CRITICAL advisories</span>
+    <span class="chip" data-k="users-count">theLook · how many users</span>
+    <span class="chip" data-k="trap">Trap · unanswerable</span>
+  </div>
+  <div class="legend">
+    <span>Phase:</span>
+    <span class="lg d">Draft</span><span class="lg e">Execute</span><span class="lg v">Verify</span><span class="lg g">Debug</span><span class="lg a">Answer</span>
+    <span class="sep">|</span>
+    <span>Status: ✓ ok · ↻ self-fix · ✗ rejected/wrong · ⚠ unchecked · ⏱ time</span>
+  </div>
+  <p class="note"><b>Honest demo:</b> the <b>theLook</b> run is a <b>real captured CRAFT round-trip</b> (SQL, assumptions, and 100,000 result verbatim). The <b>deps.dev</b> answers are <b>golden facts verified live</b> (jackson-databind 23, Jenkins-core 16, Struts2 9); its SQL is representative and the <b>Severity→GitHubSeverity</b> fix is the real failure mode CRAFT surfaced. Timings, the <b>trap</b>, and exact CVE SourceIDs are illustrative until the frozen eval lands.</p>
+
+  <div class="panels">
+    <section class="panel ung">
+      <div class="phead"><h2>Ungoverned&nbsp;✗</h2><span class="ptag">no verification · no receipt</span></div>
+      <div class="pipe" id="ugpipe"></div>
+      <div class="timeline" id="ug"></div>
+      <div class="verdict" id="ugv"></div>
+    </section>
+    <section class="panel gov">
+      <div class="phead"><h2>Governed&nbsp;✓ (ours)</h2><span class="ptag">verify · self-fix · receipt / abstain</span></div>
+      <div class="pipe" id="gvpipe"></div>
+      <div class="timeline" id="gv"></div>
+      <div class="verdict" id="gvv"></div>
+    </section>
+  </div>
+
+<script>
+const SCENARIOS = {
+  "maven-critical": {
+    match:["maven","critical","advisor","package"],
+    question:"Which Maven packages have the most CRITICAL advisories?",
+    ung:[
+      {phase:"DRAFT",c:"tool",t:"generate_sql",tag:"CRAFT · Text2SQL",status:"ok",ms:"1.3s",
+       call:'generate_sql({connection:"deps-dev-v1-642c0896", question, schema})',
+       sql:"SELECT package_name, COUNT(*) AS crit\nFROM DEPS_DEV.ADVISORIES\nWHERE Severity = 'CRITICAL'\nGROUP BY package_name\nORDER BY crit DESC LIMIT 10",
+       hlBad:"Severity",
+       n:"drafted against the Severity column — never checked what values it holds"},
+      {phase:"EXECUTE",c:"tool",t:"execute_query → get_result_page",tag:"CRAFT",status:"ok",ms:"0.9s",
+       call:'execute_query({sql, connection, max_rows:200}) → get_result_page(artifact_fqn)',
+       out:"artifact_fqn: deps-dev…:result:8f2a1c\nrow_count: 4",
+       table:{columns:["package_name","crit"],rows:[["log4j-core","4"],["spring-core","2"],["commons-io","1"]]}},
+      {phase:"ANSWER",c:"bad",t:"Answer — spoken as fact",status:"wrong",ms:"—",
+       b:"returns the top row, no checks run.",
+       n:"WRONG — Severity is mostly UNKNOWN, so these counts are near-meaningless"},
+    ],
+    ungv:{kind:"wrong",big:'“log4j-core — 4 CRITICAL advisories.”',
+      sub:"Confident, unverified, and wrong — with no way for the user to catch it.",
+      summary:[["1 draft","neutral"],["0 checks","bad"],["0 self-fixes","neutral"],["unverified","warn"]]},
+    gov:[
+      {phase:"DRAFT",c:"tool",t:"generate_sql",tag:"CRAFT · Text2SQL",status:"ok",ms:"1.3s",
+       call:'generate_sql({connection:"deps-dev-v1-642c0896", question, schema})',
+       sql:"SELECT package_name, COUNT(*) AS crit\nFROM DEPS_DEV.ADVISORIES\nWHERE Severity = 'CRITICAL'\nGROUP BY package_name\nORDER BY crit DESC LIMIT 10",
+       hlBad:"Severity",
+       list:["<b>assumption returned by CRAFT:</b> “Severity is mostly UNKNOWN — I used it, but GitHubSeverity is better populated.”"]},
+      {phase:"EXECUTE",c:"tool",t:"execute_query → get_result_page",tag:"CRAFT",status:"ok",ms:"0.9s",
+       call:'execute_query({sql, connection, max_rows:200}) → get_result_page(artifact_fqn)',
+       out:"artifact_fqn: deps-dev…:result:8f2a1c\nrow_count: 4",
+       table:{columns:["package_name","crit"],rows:[["log4j-core","4"],["spring-core","2"]]}},
+      {phase:"VERIFY",c:"gate rej",t:"VERIFY — does the result answer the question?",tag:"governance gate",status:"rej",ms:"0.4s",
+       out:"magnitude sanity … 4 CRITICAL across all of Maven?  FAIL (implausibly low)\nassumptions   … CRAFT flagged 'Severity mostly UNKNOWN'   FLAG",
+       n:"rejected — do not answer yet"},
+      {phase:"DEBUG",c:"gate rej",t:"DEBUG — classify the failure",tag:"governance gate",status:"fix",ms:"0.2s",
+       out:"category: [column-choice]\nhint:     Severity is mostly UNKNOWN → use GitHubSeverity",
+       n:"targeted fix, not a blind retry → re-draft"},
+      {phase:"DRAFT",c:"tool",t:"generate_sql (attempt 2, fixed)",tag:"CRAFT · Text2SQL",status:"ok",ms:"1.1s",
+       call:'generate_sql({…, hint:"use GitHubSeverity"})',
+       sql:"SELECT package_name, COUNT(*) AS critical_advisories\nFROM DEPS_DEV.ADVISORIES\nWHERE GitHubSeverity = 'CRITICAL' AND ecosystem = 'MAVEN'\nGROUP BY package_name\nORDER BY critical_advisories DESC LIMIT 10",
+       hl:"GitHubSeverity", diff:["Severity","GitHubSeverity"]},
+      {phase:"EXECUTE",c:"tool",t:"execute_query → get_result_page",tag:"CRAFT",status:"ok",ms:"1.0s",
+       call:'execute_query({sql, connection, max_rows:200}) → get_result_page(artifact_fqn)',
+       out:"artifact_fqn: deps-dev…:result:c71d90\nrow_count: 10",
+       table:{columns:["package_name","critical_advisories"],rows:[["jackson-databind","23"],["Jenkins-core","16"],["Struts2","9"]]}},
+      {phase:"VERIFY",c:"gate",t:"VERIFY ✓",tag:"governance gate",status:"ok",ms:"0.4s",
+       out:"columns answer the ask … PASS (package + count)\ngrain = one row per package … PASS\nmagnitude plausible …………… PASS",
+       n:"passed — safe to answer"},
+    ],
+    govv:{kind:"receipt",big:"jackson-databind — 23 CRITICAL advisories",
+      summary:[["2 drafts","info"],["1 self-fix","info"],["3 checks","good"],["verified","good"],["+~1s to verify","neutral"]],
+      table:{columns:["package_name","critical_advisories"],rows:[["jackson-databind","23"],["Jenkins-core","16"],["Struts2","9"]]},
+      why:"Counted advisories with GitHubSeverity = 'CRITICAL', grouped per Maven package. jackson-databind leads with 23.",
+      receipt:[
+        ["sql","SELECT package_name, COUNT(*) … WHERE GitHubSeverity='CRITICAL' AND ecosystem='MAVEN' …"],
+        ["assumptions","CRAFT: 'Severity mostly UNKNOWN → GitHubSeverity'"],
+        ["sources","CVE-____, CVE-____, … (23 advisory SourceIDs)"],
+        ["verified","columns &amp; grain match the question ✓"],
+      ]},
+  },
+  "users-count": {
+    match:["user","how many user","users"],
+    question:"How many users are there?",
+    ung:[
+      {phase:"DRAFT",c:"tool",t:"generate_sql",tag:"CRAFT · Text2SQL",status:"ok",ms:"0.7s",
+       call:'generate_sql({connection:"thelook-ecommerce-642c0896", question, schema})',
+       sql:'SELECT COUNT(*) AS "user_count"\nFROM THELOOK_ECOMMERCE.THELOOK_ECOMMERCE.USERS'},
+      {phase:"EXECUTE",c:"tool",t:"execute_query → get_result_page",tag:"CRAFT",status:"ok",ms:"0.6s",
+       call:'execute_query({sql, connection}) → get_result_page(artifact_fqn)',
+       out:"row_count: 1",
+       table:{columns:["user_count"],rows:[["100000"]]}},
+      {phase:"ANSWER",c:"bad",t:"Answer",status:"warn",ms:"—",b:"“<b>100,000 users.</b>”",
+       n:"right this time — but no evidence attached, and no verification on a harder question"},
+    ],
+    ungv:{kind:"wrong",big:'“100,000 users.”',
+      sub:"Correct here — but unverified and unprovable. On easy questions luck holds; on hard ones it doesn’t.",
+      summary:[["1 draft","neutral"],["0 checks","bad"],["unverified","warn"]]},
+    gov:[
+      {phase:"DRAFT",c:"tool",t:"generate_sql",tag:"CRAFT · Text2SQL",status:"ok",ms:"0.7s",
+       call:'generate_sql({connection:"thelook-ecommerce-642c0896", question, schema:{schema_name:"THELOOK_ECOMMERCE", schema_fqn:"…THELOOK_ECOMMERCE.THELOOK_ECOMMERCE"}})',
+       sql:'SELECT COUNT(*) AS "user_count"\nFROM THELOOK_ECOMMERCE.THELOOK_ECOMMERCE.USERS',
+       list:["“Users” = registered customer profiles in the USERS table.","Count includes all users — no status/activity filter, since a simple total was asked."]},
+      {phase:"EXECUTE",c:"tool",t:"execute_query",tag:"CRAFT",status:"ok",ms:"0.5s",
+       call:'execute_query({sql, connection, max_rows:200})',
+       out:"artifact_fqn: thelook…:result:1a20  ·  row_count: 1\n(execute_query returns a handle, NOT rows)"},
+      {phase:"EXECUTE",c:"tool",t:"get_result_page",tag:"CRAFT",status:"ok",ms:"0.3s",
+       call:'get_result_page({artifact_fqn, offset:0, limit:200})',
+       out:"columns: [ user_count ]",
+       table:{columns:["user_count"],rows:[["100000"]]}},
+      {phase:"VERIFY",c:"gate",t:"VERIFY ✓",tag:"governance gate",status:"ok",ms:"0.3s",
+       out:"a single COUNT answers a 'how many' question … PASS\ncolumn = user_count, grain = whole table … PASS",
+       n:"passed"},
+    ],
+    govv:{kind:"receipt",big:"100,000 users",
+      summary:[["1 draft","info"],["0 self-fixes","neutral"],["2 checks","good"],["verified live","good"]],
+      table:{columns:["user_count"],rows:[["100000"]]},
+      why:"Counted every row in the USERS table (registered customer profiles), no filters — a live, verified CRAFT round-trip.",
+      receipt:[
+        ["sql",'SELECT COUNT(*) AS "user_count" FROM …THELOOK_ECOMMERCE.USERS'],
+        ["assumptions","'Users' = all registered customer profiles; no status filter"],
+        ["rows","1 row · user_count = 100000"],
+        ["verified","live CRAFT round-trip ✓ (real captured run)"],
+      ]},
+  },
+  "trap": {
+    match:["trap","unanswerable","poison","next quarter","future","will have","predict","forecast"],
+    question:"Which package will have the most vulnerabilities next quarter?",
+    ung:[
+      {phase:"DRAFT",c:"tool",t:"generate_sql",tag:"CRAFT · Text2SQL",status:"warn",ms:"1.1s",
+       call:'generate_sql({connection:"deps-dev-v1-642c0896", question, schema})',
+       sql:"SELECT package_name, COUNT(*) AS advisories\nFROM DEPS_DEV.ADVISORIES\nGROUP BY package_name\nORDER BY advisories DESC LIMIT 1",
+       n:"quietly rewrote a future question as a past-tense one"},
+      {phase:"EXECUTE",c:"tool",t:"execute_query → get_result_page",tag:"CRAFT",status:"ok",ms:"0.8s",
+       call:'execute_query({sql, connection}) → get_result_page(artifact_fqn)',
+       out:"row_count: 1",
+       table:{columns:["package_name","advisories"],rows:[["openssl","312"]]}},
+      {phase:"ANSWER",c:"bad",t:"Answer — spoken as a prediction",status:"wrong",ms:"—",
+       b:"“<b>openssl</b> will have the most next quarter.”",
+       n:"fabricated — the database has no future data at all"},
+    ],
+    ungv:{kind:"wrong",big:'“openssl — most next quarter.”',
+      sub:"A prediction no data supports, stated with total confidence.",
+      summary:[["1 draft","neutral"],["0 checks","bad"],["fabricated","bad"]]},
+    gov:[
+      {phase:"DRAFT",c:"tool",t:"generate_sql",tag:"CRAFT · Text2SQL",status:"ok",ms:"1.1s",
+       call:'generate_sql({connection:"deps-dev-v1-642c0896", question, schema})',
+       sql:"SELECT package_name, COUNT(*) AS advisories\nFROM DEPS_DEV.ADVISORIES\nGROUP BY package_name\nORDER BY advisories DESC LIMIT 1"},
+      {phase:"EXECUTE",c:"tool",t:"execute_query → get_result_page",tag:"CRAFT",status:"ok",ms:"0.8s",
+       call:'execute_query({sql, connection}) → get_result_page(artifact_fqn)',
+       out:"row_count: 1  (historical counts only)",
+       table:{columns:["package_name","advisories"],rows:[["openssl","312"]]}},
+      {phase:"VERIFY",c:"gate rej",t:"VERIFY — does the result answer the question?",tag:"governance gate",status:"rej",ms:"0.4s",
+       out:"question is about the FUTURE ('next quarter')\ndata is HISTORICAL — no future rows exist\ncoverage … FAIL (no result can answer this)",
+       n:"cannot verify → must not guess"},
+    ],
+    govv:{kind:"abstain",big:"UNVERIFIED — check manually",
+      sub:"The question isn’t answerable from this data (it asks about the future; the DB is historical). Abstaining beats a confident guess.",
+      summary:[["1 draft","neutral"],["verify failed","warn"],["0 fabrications","good"],["abstained","warn"]]},
+  },
+};
+
+const params = new URLSearchParams(location.search);
+const INSTANT = params.get("instant")==="1";
+const STEP = INSTANT?0:680, GAP=INSTANT?0:320;
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&(?!amp;|lt;|gt;)/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const PHNAME = {DRAFT:"Draft",EXECUTE:"Execute",VERIFY:"Verify",DEBUG:"Debug",ANSWER:"Answer",ABSTAIN:"Abstain"};
+const STATUS = {ok:["ok","✓ ok"],wrong:["wrong","✗ wrong"],warn:["warn","⚠ unchecked"],rej:["rej","✗ rejected"],fix:["fix","↻ fixed"]};
+let running=false;
+
+function pick(text){
+  const q=(text||"").toLowerCase().trim(); let best=null,score=0;
+  for(const k in SCENARIOS){
+    const s=SCENARIOS[k].match.reduce((a,m)=>a+(q.includes(m)?1:0),0);
+    if(s>score){score=s;best=k;}
+  }
+  return best||"maven-critical";
+}
+function tableHTML(tb){
+  if(!tb) return "";
+  const head=tb.columns.map(c=>`<th>${c}</th>`).join("");
+  const body=tb.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+  return `<table class="res"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+function sqlHTML(st){
+  let s=esc(st.sql);
+  if(st.hl) s=s.split(st.hl).join(`<span class="ins">${esc(st.hl)}</span>`);
+  if(st.hlBad) s=s.split(st.hlBad).join(`<span class="del">${esc(st.hlBad)}</span>`);
+  let cap="";
+  if(st.diff) cap=`<div class="diffcap">changed: <span class="d1">${st.diff[0]}</span> → <span class="d2">${st.diff[1]}</span></div>`;
+  return `<pre class="code sql">${s}</pre>${cap}`;
+}
+function stepEl(st){
+  const phcls="ph-"+st.phase.toLowerCase();
+  const [scls,slabel]=STATUS[st.status]||["",""];
+  const p=[];
+  p.push(`<div class="t"><span class="ph ${phcls}">${st.phase}</span><span class="ttl">${st.t}</span>`+
+         `<span class="spacer"></span>${slabel?`<span class="stat ${scls}">${slabel}</span>`:""}`+
+         `${st.ms?`<span class="ms">⏱ ${st.ms}</span>`:""}</div>`);
+  if(st.tag) p.push(`<div class="subtag">${st.tag}</div>`);
+  if(st.b) p.push(`<div class="b">${st.b}</div>`);
+  if(st.call) p.push(`<div class="call">→ ${esc(st.call)}</div>`);
+  if(st.sql) p.push(sqlHTML(st));
+  if(st.list) p.push(`<ul class="assump">${st.list.map(x=>`<li>${x}</li>`).join("")}</ul>`);
+  if(st.out) p.push(`<pre class="code out">${esc(st.out)}</pre>`);
+  if(st.table) p.push(tableHTML(st.table));
+  if(st.n) p.push(`<div class="n">${st.n}</div>`);
+  const d=document.createElement("div"); d.className="step "+st.c+" "+phcls; d.innerHTML=p.join("");
+  return d;
+}
+function stepperHTML(steps, verdict, side){
+  const end = verdict.kind==="abstain" ? "ABSTAIN":"ANSWER";
+  const hasDebug = steps.some(s=>s.phase==="DEBUG");
+  const nodes = (side==="ung")
+    ? [{p:"DRAFT"},{p:"EXECUTE"},{p:"VERIFY",skip:true},{p:end}]
+    : [{p:"DRAFT"},{p:"EXECUTE"},{p:"VERIFY",loop:hasDebug},{p:end}];
+  return nodes.map((n,i)=>{
+    const arrow=i?`<span class="parrow">→</span>`:"";
+    let cls="pnode ph-"+n.p.toLowerCase(); if(n.skip) cls+=" skip";
+    const badge=n.loop?` <span class="loop">↻</span>`:(n.skip?` <span class="skiplbl">skipped ✗</span>`:"");
+    return arrow+`<span class="${cls}">${PHNAME[n.p]}${badge}</span>`;
+  }).join("");
+}
+function verdictHTML(v){
+  const sc = v.summary?`<div class="scorecard">${v.summary.map(([t,tone])=>`<span class="sc ${tone}">${t}</span>`).join("")}</div>`:"";
+  if(v.kind==="receipt"){
+    const rows=v.receipt.map(([k,val])=>`<span class="k">${k}:</span> ${val}`).join("<br>");
+    return {cls:"receipt",html:sc+`<div class="big">✓ ${v.big}</div>${tableHTML(v.table)}`+
+      `${v.why?`<div class="why"><b>Why:</b> ${v.why}</div>`:""}<div class="receiptbox">— RECEIPT —<br>${rows}</div>`};
+  }
+  if(v.kind==="abstain") return {cls:"abstain",html:sc+`<div class="big">⚠ ${v.big}</div><div class="why">${v.sub}</div>`};
+  return {cls:"wrong",html:sc+`<div class="big">✗ ${v.big}</div><div class="why">${v.sub}</div>`};
+}
+async function revealInto(elId, steps){
+  const box=$(elId);
+  for(const st of steps){
+    const el=stepEl(st); box.appendChild(el);
+    await sleep(20); el.classList.add("show");
+    el.scrollIntoView({behavior:"smooth",block:"nearest"});
+    await sleep(STEP);
+  }
+}
+async function showVerdict(elId, v){
+  const box=$(elId); const {cls,html}=verdictHTML(v);
+  box.className="verdict "+cls; box.innerHTML=html;
+  await sleep(20); box.classList.add("show");
+}
+function clearAll(){
+  ["ug","gv","ugpipe","gvpipe"].forEach(i=>$(i).innerHTML="");
+  ["ugv","gvv"].forEach(i=>{$(i).className="verdict";$(i).innerHTML="";});
+}
+async function run(forceKey){
+  if(running) return; running=true; $("run").disabled=true;
+  clearAll();
+  const key=(forceKey&&SCENARIOS[forceKey])?forceKey:pick($("q").value);
+  const sc=SCENARIOS[key];
+  $("q").value=sc.question;
+  $("ugpipe").innerHTML=stepperHTML(sc.ung,sc.ungv,"ung");
+  $("gvpipe").innerHTML=stepperHTML(sc.gov,sc.govv,"gov");
+  await revealInto("ug",sc.ung); await sleep(GAP);
+  await showVerdict("ugv",sc.ungv); await sleep(GAP*1.4);
+  await revealInto("gv",sc.gov); await sleep(GAP);
+  await showVerdict("gvv",sc.govv);
+  running=false; $("run").disabled=false;
+}
+$("run").onclick=()=>run();
+$("reset").onclick=()=>{if(!running)clearAll();};
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+  if(running)return; $("q").value=SCENARIOS[c.dataset.k].question; run(c.dataset.k);
+});
+if(INSTANT){ const k=params.get("scenario"); if(k&&SCENARIOS[k])$("q").value=SCENARIOS[k].question; run(k); }
+</script>
+</body>
+</html>

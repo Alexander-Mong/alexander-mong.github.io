@@ -1,0 +1,100 @@
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#475569"/></marker>
+    <marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a16207"/></marker>
+    <marker id="ai" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#6d28d9"/></marker>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#6d28d9" flood-opacity="0.30"/></filter>
+    <linearGradient id="spec" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#15803d"/><stop offset="0.5" stop-color="#b45309"/><stop offset="1" stop-color="#6d28d9"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1920" height="1080" fill="#ffffff"/>
+
+  <!-- TITLE -->
+  <text x="60" y="78" font-size="50" font-weight="800" fill="#0f172a">Evidence, graded — answer · qualify · defer</text>
+  <text x="60" y="116" font-size="24" fill="#475569">An <tspan font-weight="700" fill="#0f172a">evidence-gatherer, not an oracle</tspan>: it grades its own confidence from CRAFT's assumptions. The human decides — no ship/don't-ship verdict.</text>
+  <rect x="1330" y="40" width="530" height="52" rx="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="1595" y="72" font-size="17" fill="#475569" text-anchor="middle">Confidence classifier = heuristic v1 (disclosed) · replayed capture</text>
+
+  <!-- SPINE: REQUEST -> GATHER -> GRADE -->
+  <rect x="60" y="188" width="300" height="120" rx="14" fill="#e8eef7" stroke="#334155" stroke-width="2.5"/>
+  <text x="210" y="222" font-size="21" font-weight="800" fill="#334155" text-anchor="middle">REQUEST</text>
+  <text x="210" y="250" font-size="15" fill="#475569" text-anchor="middle">a question about a</text>
+  <text x="210" y="270" font-size="15" fill="#475569" text-anchor="middle">package or vulnerability</text>
+  <text x="210" y="294" font-size="14" font-style="italic" fill="#64748b" text-anchor="middle">"…advisories for jackson-databind?"</text>
+
+  <rect x="400" y="176" width="560" height="144" rx="14" fill="#dbeafe" stroke="#1d4ed8" stroke-width="3"/>
+  <text x="680" y="210" font-size="24" font-weight="800" fill="#1e3a8a" text-anchor="middle">GATHER EVIDENCE · CRAFT</text>
+  <text x="680" y="238" font-size="18" fill="#1e40af" text-anchor="middle">generate_sql → execute_query → get_result_page (real rows)</text>
+  <rect x="422" y="256" width="516" height="50" rx="9" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="680" y="287" font-size="16" font-weight="700" fill="#1e3a8a" text-anchor="middle">CRAFT states its OWN assumptions  ← the enabler</text>
+
+  <rect x="1000" y="190" width="430" height="116" rx="14" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+  <text x="1215" y="228" font-size="24" font-weight="800" fill="#0f172a" text-anchor="middle">GRADE CONFIDENCE  ◆</text>
+  <text x="1215" y="256" font-size="17" fill="#334155" text-anchor="middle">from CRAFT's own assumptions</text>
+  <text x="1215" y="282" font-size="15" font-style="italic" fill="#64748b" text-anchor="middle">(simple heuristic v1 — disclosed limitation)</text>
+
+  <line x1="360" y1="248" x2="396" y2="248" stroke="#475569" stroke-width="3" marker-end="url(#a)"/>
+  <line x1="960" y1="248" x2="996" y2="248" stroke="#475569" stroke-width="3" marker-end="url(#a)"/>
+
+  <!-- SPECTRUM bar -->
+  <rect x="70" y="356" width="1780" height="10" rx="5" fill="url(#spec)"/>
+  <text x="90" y="392" font-size="15" font-weight="700" fill="#15803d">answered as asked</text>
+  <text x="935" y="392" font-size="15" font-weight="700" fill="#b45309" text-anchor="middle">answered — with a caveat</text>
+  <text x="1830" y="392" font-size="15" font-weight="700" fill="#6d28d9" text-anchor="end">couldn't answer → defer</text>
+
+  <!-- fan arrows GRADE -> 3 tiers -->
+  <path d="M1120,306 C820,360 500,400 360,452" fill="none" stroke="#15803d" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M1215,306 C1050,360 960,400 940,452" fill="none" stroke="#b45309" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M1310,306 C1480,360 1540,392 1555,432" fill="none" stroke="#6d28d9" stroke-width="4" marker-end="url(#ai)"/>
+
+  <!-- ANSWER -->
+  <rect x="70" y="454" width="555" height="256" rx="16" fill="#dcfce7" stroke="#15803d" stroke-width="3"/>
+  <text x="94" y="496" font-size="30" font-weight="800" fill="#14532d">ANSWER</text>
+  <text x="94" y="524" font-size="17" fill="#166534">CRAFT answered as asked, from real fields.</text>
+  <rect x="90" y="540" width="515" height="86" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+  <text x="106" y="568" font-size="17" font-weight="800" fill="#14532d">jackson-databind</text>
+  <text x="106" y="594" font-size="16" fill="#166534">→ 23 CRITICAL advisories in this dataset</text>
+  <text x="106" y="616" font-size="16" fill="#166534">reference it</text>
+  <text x="94" y="654" font-size="14.5" fill="#3f6212">"auditable evidence for a human to weigh —</text>
+  <text x="94" y="674" font-size="14.5" fill="#3f6212">not a ship/don't-ship verdict."</text>
+  <text x="94" y="698" font-size="13" font-family="Consolas, monospace" fill="#15803d">receipt: COUNT(DISTINCT SourceID) · rows [23]</text>
+
+  <!-- QUALIFIED -->
+  <rect x="655" y="454" width="555" height="256" rx="16" fill="#fef3c7" stroke="#b45309" stroke-width="3"/>
+  <text x="679" y="496" font-size="30" font-weight="800" fill="#92400e">QUALIFIED</text>
+  <text x="679" y="524" font-size="17" fill="#a16207">CRAFT substituted a related field → value + caveat.</text>
+  <rect x="675" y="540" width="515" height="86" rx="10" fill="#ffffff" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="691" y="568" font-size="17" font-weight="800" fill="#92400e">CVSS exploitability</text>
+  <text x="691" y="594" font-size="16" fill="#a16207">→ Closest available answer: 7.16</text>
+  <text x="691" y="617" font-size="14.5" font-weight="800" fill="#b45309">⚠ may not be the exact metric — a human confirms</text>
+  <text x="679" y="656" font-size="13" font-family="Consolas, monospace" fill="#92400e">receipt: AVG("CVSS3Score")</text>
+  <text x="679" y="676" font-size="13" font-family="Consolas, monospace" fill="#92400e">          AS AVG_CVSS_EXPLOITABILITY_SCORE</text>
+  <text x="679" y="698" font-size="13" font-style="italic" fill="#a16207">the substitution is visible in the receipt</text>
+
+  <!-- ESCALATE (star, dominant) -->
+  <rect x="1250" y="434" width="600" height="296" rx="18" fill="#ede9fe" stroke="#6d28d9" stroke-width="5" filter="url(#sh)"/>
+  <rect x="1250" y="434" width="600" height="54" rx="16" fill="#6d28d9"/>
+  <text x="1550" y="472" font-size="29" font-weight="800" fill="#ffffff" text-anchor="middle">★  ESCALATE → HUMAN</text>
+  <text x="1550" y="516" font-size="18" font-weight="800" fill="#5b21b6" text-anchor="middle">the asked-for data isn't in the schema (or no rows)</text>
+  <text x="1550" y="540" font-size="18" font-weight="800" fill="#5b21b6" text-anchor="middle">→ defer; assert nothing</text>
+  <rect x="1272" y="556" width="556" height="96" rx="10" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.8"/>
+  <text x="1290" y="584" font-size="17" font-weight="800" fill="#4c1d95">black-market price of a struts2 zero-day</text>
+  <text x="1290" y="610" font-size="17" fill="#5b21b6">→ "Can't answer — the data isn't in this dataset"</text>
+  <text x="1290" y="638" font-size="15" font-weight="800" fill="#6d28d9">no value · no rows — a clean defer</text>
+  <text x="1550" y="682" font-size="16" font-weight="800" fill="#4c1d95" text-anchor="middle">the differentiator: it refuses to fabricate what isn't there</text>
+  <text x="1550" y="708" font-size="14" font-style="italic" fill="#7c3aed" text-anchor="middle">knowing the edge of your evidence is the enterprise skill</text>
+
+  <!-- arrows tiers -> receipt -->
+  <line x1="347" y1="710" x2="347" y2="768" stroke="#a16207" stroke-width="3" marker-end="url(#ag)"/>
+  <line x1="932" y1="710" x2="932" y2="768" stroke="#a16207" stroke-width="3" marker-end="url(#ag)"/>
+  <line x1="1550" y1="730" x2="1550" y2="768" stroke="#a16207" stroke-width="3" marker-end="url(#ag)"/>
+
+  <!-- RECEIPT band (through-line) -->
+  <rect x="70" y="772" width="1780" height="118" rx="16" fill="#fefce8" stroke="#a16207" stroke-width="3"/>
+  <text x="150" y="820" font-size="30" font-weight="800" fill="#854d0e">EVERY path → RECEIPT</text>
+  <text x="150" y="856" font-size="21" fill="#713f12">SQL + rows + CRAFT's own assumptions.  An answer, a qualified answer, or a defer — each is auditable, and the human decides.</text>
+
+  <text x="60" y="936" font-size="16" fill="#94a3b8">Source: spider_agent/decisions_frozen.json (real live capture, replayed deterministically). The confidence classifier is a simple heuristic v1 — a disclosed limitation.</text>
+  <text x="60" y="962" font-size="16" fill="#94a3b8">CRAFT is credited as the enabler: it states its own assumptions; the agent leverages them to grade confidence and escalate. It gathers &amp; grades evidence — it does not decide.</text>
+</svg>

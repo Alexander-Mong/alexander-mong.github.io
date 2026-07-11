@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Is it safe to ship? — governed vs ungoverned</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --panel:#ffffff; --panel2:#f8fafc; --line:#dbe1ea; --ink:#0f172a; --muted:#475569; --faint:#7b8aa3;
+    --tool:#1d4ed8; --gate:#0f766e; --pass:#15803d; --block:#b91c1c; --escalate:#6d28d9; --danger:#dc2626;
+    --mono:"SF Mono",Consolas,"Roboto Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,sans-serif;padding:22px 26px 40px}
+  h1{font-size:32px;margin:0;font-weight:800;letter-spacing:-.01em}
+  .lead{color:var(--muted);font-size:15px;margin:5px 0 16px}
+  .lead b.p{color:var(--pass)} .lead b.b{color:var(--block)} .lead b.e{color:var(--escalate)}
+  .bar{display:flex;gap:10px;align-items:center;max-width:860px}
+  #q{flex:1;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink)}
+  #q:focus{outline:none;border-color:var(--tool)}
+  button{font-size:15px;font-weight:700;padding:12px 22px;border:none;border-radius:10px;cursor:pointer}
+  #run{background:var(--ink);color:#fff} #run:disabled{opacity:.5;cursor:default}
+  .chips{margin:12px 0 4px;display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+  .chips .lbl{color:var(--muted);font-size:13px;margin-right:2px}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px;color:var(--ink);cursor:pointer;font-weight:600}
+  .chip:hover{border-color:var(--tool)}
+  .chip .tag{font-weight:800;font-size:11px;margin-left:5px}
+  .chip.pass .tag{color:var(--pass)} .chip.block .tag{color:var(--block)}
+  .chip.esc{border-color:var(--escalate);background:#f5f3ff}
+  .chip.esc .tag{color:var(--escalate)}
+  .fairness{font-size:13px;color:var(--muted);margin:10px 0 16px;max-width:1000px}
+  .fairness b{color:var(--ink)}
+  .panels{display:flex;gap:20px;align-items:stretch;height:660px}
+  .panel{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--panel);border:2.5px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 2px 6px rgba(15,23,42,.06)}
+  .panel.ung{border-color:var(--danger)} .panel.gov{border-color:var(--pass)}
+  .phead{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none}
+  .phead .name{font-size:18px;font-weight:800;line-height:1.15}
+  .panel.ung .name{color:var(--danger)} .panel.gov .name{color:var(--pass)}
+  .phead .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .score{text-align:right;line-height:1.2}
+  .score .big{font-size:22px;font-weight:800;font-family:var(--mono)}
+  .panel.ung .score .big{color:var(--danger)} .panel.gov .score .big{color:var(--pass)}
+  .score .cap{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .trace{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+  .trace.center{justify-content:center}
+  .step{border:1px solid var(--line);border-left-width:4px;border-radius:10px;padding:10px 13px;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+  .step.show{opacity:1;transform:none}
+  .step.p-draft{border-left-color:var(--tool)} .step.p-execute{border-left-color:var(--tool)}
+  .step.p-llm{border-left-color:var(--danger);background:#fef2f2}
+  .shead{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .ph{font-size:11px;font-weight:800;letter-spacing:.04em;color:#fff;padding:2px 8px;border-radius:6px}
+  .ph.p-draft,.ph.p-execute{background:var(--tool)} .ph.p-llm{background:var(--danger)}
+  .shead .tool{font-family:var(--mono);font-size:14px;font-weight:700}
+  .shead .spacer{flex:1}
+  .st{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px}
+  .st.ok{background:#eef2f7;color:var(--faint)} .st.wrong{background:#fee2e2;color:#991b1b}
+  .call{font-family:var(--mono);font-size:12px;color:#334155;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+  pre.code{font-family:var(--mono);font-size:13px;background:#0b122413;color:#0f172a;padding:9px 11px;border-radius:8px;
+           white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;margin:7px 0 0;line-height:1.5}
+  pre.code .kw{color:#7c3aed;font-weight:700} pre.code .lit{color:#0e7490;font-weight:700}
+  .assum{margin:7px 0 0;padding:9px 11px;background:var(--panel2);border:1px solid var(--line);border-radius:8px}
+  .assum .al{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800;margin-bottom:4px}
+  .assum ul{margin:0;padding-left:17px;font-size:13px;color:#334155;line-height:1.5}
+  .assum li{margin:2px 0}
+  .confess-chip{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:800;color:#7c2d12;background:#ffedd5;border:1px solid #fdba74;border-radius:7px;padding:5px 10px}
+  table.res{border-collapse:collapse;font-size:14px;margin:8px 0 0;font-family:var(--mono)}
+  table.res th,table.res td{border:1px solid var(--line);padding:5px 13px;text-align:left}
+  table.res th{background:#eef2f7;color:var(--muted);font-size:12px}
+  table.res td{font-weight:800}
+  .note-in{font-size:13px;margin-top:7px;color:#334155}
+  /* GATE band */
+  .gate{border:2px solid var(--gate);border-radius:11px;padding:11px 14px;background:#f0fdfa;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+  .gate.show{opacity:1;transform:none}
+  .gate .glabel{font-size:12px;font-weight:800;letter-spacing:.05em;color:var(--gate);display:flex;align-items:center;gap:7px}
+  .gate .gq{font-size:14.5px;font-weight:700;margin-top:5px;color:#0f172a}
+  .gate .ga{font-size:15px;font-weight:800;margin-top:6px}
+  .gate .ga.yes{color:var(--gate)} .gate .ga.no{color:var(--escalate)}
+  /* foil terminal marker */
+  .deadend{border:1.5px dashed #fca5a5;border-radius:10px;padding:14px;text-align:center;color:#b91c1c;font-size:13.5px;font-weight:700;background:#fef2f2}
+  .deadend .sub{font-weight:500;color:#9f5b5b;font-size:12.5px;margin-top:3px}
+  /* verdict (docked) */
+  .verdict{flex:none;margin:0;border-top:1px solid var(--line);padding:15px 18px;opacity:0;transition:opacity .35s}
+  .verdict.show{opacity:1}
+  .verdict.pass{background:#f0fdf4} .verdict.block{background:#f0fdf4}
+  .verdict.escalate{background:#f5f3ff} .verdict.wrong{background:#fef2f2}
+  .vtop{display:flex;align-items:center;gap:14px}
+  .vbadge{font-size:26px;font-weight:900;letter-spacing:-.01em;white-space:nowrap}
+  .verdict.pass .vbadge{color:var(--pass)} .verdict.block .vbadge{color:var(--block)}
+  .verdict.escalate .vbadge{color:var(--escalate)} .verdict.wrong .vbadge{color:var(--danger)}
+  .hero{margin-left:auto;text-align:right;line-height:1}
+  .hero .num{font-size:44px;font-weight:900;font-family:var(--mono)}
+  .verdict.pass .hero .num,.verdict.block .hero .num{color:var(--pass)}
+  .hero .lab{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+  .hero .stamp{display:inline-block;font-size:11px;font-weight:900;color:#fff;background:var(--pass);border-radius:5px;padding:2px 7px;margin-top:5px}
+  .collide{margin-left:auto;text-align:right;font-family:var(--mono)}
+  .collide .fake{font-size:34px;font-weight:900;color:var(--danger);text-decoration:line-through}
+  .collide .arrow{font-size:20px;color:var(--muted);margin:0 6px}
+  .collide .real{font-size:34px;font-weight:900;color:var(--pass)}
+  .collide .stamp{display:block;font-size:11px;font-weight:900;color:#fff;background:var(--danger);border-radius:5px;padding:2px 7px;margin-top:5px}
+  .vsub{font-size:13.5px;color:#334155;margin-top:9px;line-height:1.45}
+  .receipt{margin-top:11px;background:#fffdf5;border:1px solid #eaddb0;border-radius:9px;padding:10px 12px}
+  .receipt .rh{font-size:11.5px;font-weight:800;letter-spacing:.05em;color:#92790f;display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .receipt .rb{font-family:var(--mono);font-size:12px;color:#3f3a1a;line-height:1.7}
+  .receipt .rb .k{color:#92790f;font-weight:700}
+  .receipt .sig{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--faint);border-top:1px dashed #eaddb0;padding-top:5px}
+  .empty{color:var(--faint);font-size:14px;text-align:center;padding:20px 10px;line-height:1.6}
+  .empty .big{font-size:15px;color:var(--muted);font-weight:600}
+  .note{margin:16px 0 0;font-size:12px;color:var(--faint);max-width:1200px;line-height:1.5}
+  @media (max-width:940px){.panels{flex-direction:column;height:auto}.panel{height:560px}}
+</style>
+</head>
+<body>
+  <h1>Is it safe to ship this package?</h1>
+  <p class="lead">Same model on both sides. One answers from memory; the other gathers real evidence, checks whether it can stand behind it, and rules — <b class="p">PASS</b> · <b class="b">BLOCK</b> · <b class="e">ESCALATE</b>.</p>
+
+  <div class="bar">
+    <input id="q" value="Is it safe to ship jackson-databind?"/>
+    <button id="run">Run ▶</button>
+  </div>
+  <div class="chips">
+    <span class="lbl">Try:</span>
+    <span class="chip pass" data-k="commons-lang3">commons-lang3 <span class="tag">PASS</span></span>
+    <span class="chip block" data-k="jackson">jackson-databind <span class="tag">BLOCK</span></span>
+    <span class="chip esc" data-k="moby">moby/moby maintainer-contact <span class="tag">★ ESCALATE — the differentiator</span></span>
+  </div>
+  <p class="fairness"><b>The difference is grounding.</b> One side answers from the model's own memory; the other gathers real evidence and attaches a receipt. Asked of 25 ungrounded models on Nebius, the answers scatter — none returns the audited number (full comparison on the <a href="pitch.html">pitch page</a>).</p>
+
+  <div class="panels">
+    <section class="panel ung">
+      <div class="phead">
+        <div><div class="name">Ungrounded model</div><div class="sub">answers from memory · no data</div></div>
+        <div class="score" id="ung-score"></div>
+      </div>
+      <div class="trace center" id="ung"><div class="empty"><div class="big">Answers from memory.</div>Press Run ▶ or pick a package.</div></div>
+      <div class="verdict" id="ungv"></div>
+    </section>
+    <section class="panel gov">
+      <div class="phead">
+        <div><div class="name">Grounded + governed</div><div class="sub">real evidence · confidence gate · receipt</div></div>
+        <div class="score" id="gov-score"></div>
+      </div>
+      <div class="trace center" id="gov"><div class="empty"><div class="big">Gathers evidence, then decides.</div>Press Run ▶ or pick a package.</div></div>
+      <div class="verdict" id="govv"></div>
+    </section>
+  </div>
+  <p class="note"><b>Reproducible demo:</b> replays the real frozen decisions (<code>decisions_frozen.json</code>) — actual generated SQL, rows, and CRAFT's own assumptions from a live capture; runs identically every time, offline. Advisory IDs shown are real deps.dev SourceIDs (subset). The full 25-model comparison is on the <a href="pitch.html">pitch page</a>.</p>
+
+<script>
+const SQL_COMMONS=`SELECT COUNT(DISTINCT a."SourceID") AS critical_advisory_count
+FROM DEPS_DEV_V1.DEPS_DEV_V1.ADVISORIES a,
+     LATERAL FLATTEN(input => a."Packages") f
+WHERE a."GitHubSeverity" = 'CRITICAL'
+  AND f.value:"Name"::VARCHAR ILIKE '%commons-lang3%'`;
+const SQL_JACKSON=`SELECT COUNT(*) AS critical_advisory_count
+FROM "DEPS_DEV_V1"."DEPS_DEV_V1"."ADVISORIES",
+     LATERAL FLATTEN(input => "Packages") f
+WHERE f.value:"Name"::VARCHAR ILIKE '%jackson-databind%'
+  AND "GitHubSeverity" = 'CRITICAL'`;
+const RE=`'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'`;
+const SQL_MOBY=`SELECT DISTINCT
+    REGEXP_SUBSTR("Description", ${RE}) AS "Email"
+FROM DEPS_DEV_V1.DEPS_DEV_V1.ADVISORIES
+WHERE "Packages"::VARCHAR LIKE '%moby/moby%'
+  AND REGEXP_SUBSTR("Description", ${RE}) IS NOT NULL`;
+
+const SCEN={
+ "commons-lang3":{q:"Is it safe to ship commons-lang3?",
+  ung:{events:[{phase:"llm",tool:"model answer",status:"wrong",note:"“commons-lang3 is mature and everywhere, so it's almost certainly fine to ship.”"}],
+    verdict:{kind:"wrong",badge:"“Probably safe.”",sub:"A guess that happens to be right — no evidence, nothing to audit."}},
+  gov:{decision:"PASS",events:[
+    {phase:"draft",tool:"generate_sql",status:"ok",call:'generate_sql({question, connection:"deps-dev-v1-642c0896"})',sql:SQL_COMMONS,
+     assum:["'CRITICAL' = the GitHubSeverity enum value (schema-bound, not free text).","Matched the package Name inside the Packages JSON via ILIKE '%commons-lang3%'.","No advisory in the deps.dev set lists a package matching commons-lang3."]},
+    {phase:"execute",tool:"execute_query → get_result_page",status:"ok",call:"queried the real ADVISORIES table → 1 aggregate row",table:{columns:["CRITICAL_ADVISORY_COUNT"],rows:[["0"]]}},
+    {phase:"gate",q:"Can we stand behind this evidence?",answer:"YES → 0 CRITICAL in the advisory set",kind:"yes",note:"rows present · GitHubSeverity is a schema-bound enum · assumptions confess no stretch"}],
+   verdict:{kind:"pass",badge:"✓ PASS",hero:{num:"0",lab:"CRITICAL · verified",stamp:"VERIFIED"},
+     sub:"0 CRITICAL advisories in the deps.dev set. Governance stays honest about scope: checked and clean, not just assumed.",
+     receipt:[["count","0 CRITICAL"],["scope","deps.dev ADVISORIES (GitHubSeverity enum)"],["sql","ILIKE '%commons-lang3%' AND GitHubSeverity='CRITICAL'"]]}}},
+ "jackson":{q:"Is it safe to ship jackson-databind?",
+  ung:{events:[{phase:"llm",tool:"model answer",status:"wrong",note:"“jackson-databind has a long history of deserialization CVEs — on the order of 60 critical advisories.”"}],
+    verdict:{kind:"wrong",badge:"“~60 CRITICAL.”",collide:{fake:"~60",real:"23"},stamp:"NO RECEIPT",
+      sub:"A number it can't back with a query. The audited count is 23; across 25 ungrounded models the field scatters 0–100, and none returns 23."}},
+  gov:{decision:"BLOCK",events:[
+    {phase:"draft",tool:"generate_sql",status:"ok",call:'generate_sql({question, connection:"deps-dev-v1-642c0896"})',sql:SQL_JACKSON,
+     assum:["'Packages' is a JSON array; each object's 'Name' identifies an affected package.","ILIKE captures both 'com.fasterxml.jackson.core:jackson-databind' and '…jackson:jackson-databind'.","'CRITICAL' = the GitHubSeverity enum value."]},
+    {phase:"execute",tool:"execute_query → get_result_page",status:"ok",call:"queried the real ADVISORIES table → 1 aggregate row",table:{columns:["CRITICAL_ADVISORY_COUNT"],rows:[["23"]]}},
+    {phase:"gate",q:"Can we stand behind this evidence?",answer:"YES → act on the real 23",kind:"yes",note:"rows present · schema-bound severity · assumptions clean (no confession) → trusted"}],
+   verdict:{kind:"block",badge:"⛔ BLOCK",hero:{num:"23",lab:"CRITICAL · verified",stamp:"VERIFIED"},
+     sub:"23 CRITICAL advisories on record — do not ship without remediation.",
+     receipt:[["count","23 CRITICAL"],["sources","CVE-2020-36518 · GHSA-57j2-w4cx-62h2 · +21 more"],["sql","ILIKE '%jackson-databind%' AND GitHubSeverity='CRITICAL'"]]}}},
+ "moby":{q:"Should I auto-act on the moby/moby maintainer contact?",
+  ung:{events:[{phase:"llm",tool:"model answer",status:"wrong",note:"“I can't verify a maintainer contact for this from what I have.”"}],
+    verdict:{kind:"wrong",badge:"No verifiable answer",
+      sub:"Here an ungrounded model may simply decline — the honest contrast isn't that it fabricates. What the grounded agent adds is a specific, auditable reason to defer: the data has no structured contact field."}},
+  gov:{decision:"ESCALATE",events:[
+    {phase:"draft",tool:"generate_sql",status:"ok",call:'generate_sql({question, connection:"deps-dev-v1-642c0896"})',sql:SQL_MOBY,
+     assum:["CRAFT: the ADVISORIES table has no structured maintainer-email column.","Fell back to REGEXP_SUBSTR over the free-text Description field.","This does not have a verified contact source — the email is scraped, not authoritative."],
+     confess:"⚠ SELF-DOUBT — the agent flags its own evidence as scraped &amp; unverified"},
+    {phase:"execute",tool:"execute_query → get_result_page",status:"ok",call:"queried the real ADVISORIES table → 1 row",table:{columns:["Email"],rows:[["security@docker.com"]]}},
+    {phase:"gate",q:"Can we stand behind this evidence?",answer:"NO → no verified source · defer to a human",kind:"no",note:"CRAFT confessed there is no structured, authoritative contact column — acting on scraped text is not defensible"}],
+   verdict:{kind:"escalate",badge:"★ ESCALATE → HUMAN",hero:{num:"DEFERRED",lab:"no action taken"},
+     sub:"It found security@docker.com — but the agent flagged its own evidence as scraped &amp; unverified, so it STOPS and routes to a person instead of auto-acting. Knowing when NOT to act is the whole point.",
+     receipt:[["result","security@docker.com (scraped, unverified)"],["why-defer","CRAFT assumption: 'no structured email column'"],["action","routed to human review — nothing sent"]]}}},
+};
+
+const params=new URLSearchParams(location.search), INSTANT=params.get("instant")==="1";
+const STEP=INSTANT?0:660, GAP=INSTANT?0:340, sleep=ms=>new Promise(r=>setTimeout(r,ms)), $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&(?!amp;|lt;|gt;|#)/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const PH={draft:"DRAFT",execute:"EVIDENCE",llm:"NO TOOLS"};
+let running=false;
+
+function hlSQL(sql){
+  let s=esc(sql);
+  s=s.replace(/&#39;[^&]*?&#39;|'[^']*'/g,m=>`<span class="lit">${m}</span>`);
+  s=s.replace(/\b(SELECT|FROM|WHERE|AND|OR|AS|DISTINCT|COUNT|LATERAL|FLATTEN|input|ILIKE|LIKE|REGEXP_SUBSTR|IS|NOT|NULL)\b/g,'<span class="kw">$1</span>');
+  return s;
+}
+function tableHTML(tb){return `<table class="res"><thead><tr>${tb.columns.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>`+
+  tb.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")+`</tbody></table>`;}
+function stepEl(st){
+  if(st.phase==="gate"){
+    const d=document.createElement("div"); d.className="gate";
+    d.innerHTML=`<div class="glabel">🛡 GOVERNED GATE</div><div class="gq">${esc(st.q)}</div>`+
+      `<div class="ga ${st.kind}">${st.kind==="yes"?"✓ ":"✗ "}${esc(st.answer)}</div><div class="note-in" style="color:var(--muted)">${esc(st.note)}</div>`;
+    return d;
+  }
+  const parts=[`<div class="shead"><span class="ph p-${st.phase}">${PH[st.phase]}</span><span class="tool">${st.tool}</span><span class="spacer"></span>`+
+    `<span class="st ${st.status}">${st.status==="ok"?"ok":"no evidence"}</span></div>`];
+  if(st.call) parts.push(`<div class="call">${esc(st.call)}</div>`);
+  if(st.sql) parts.push(`<pre class="code">${hlSQL(st.sql)}</pre>`);
+  if(st.assum){parts.push(`<div class="assum"><div class="al">CRAFT assumptions (its own words)</div><ul>${st.assum.map(a=>{
+    const cf=/no structured|does not|scraped|not authoritative/i.test(a); return `<li${cf?' style="color:#7c2d12;font-weight:700"':''}>${esc(a)}</li>`;}).join("")}</ul>`+
+    (st.confess?`<div class="confess-chip">${st.confess}</div>`:"")+`</div>`);}
+  if(st.table) parts.push(tableHTML(st.table));
+  if(st.note) parts.push(`<div class="note-in">${esc(st.note)}</div>`);
+  const d=document.createElement("div"); d.className="step p-"+st.phase; d.innerHTML=parts.join("");
+  return d;
+}
+function verdictHTML(v){
+  let right="";
+  if(v.hero) right=`<div class="hero"><div class="num">${esc(v.hero.num)}</div><div class="lab">${esc(v.hero.lab)}</div>${v.hero.stamp?`<span class="stamp">${v.hero.stamp}</span>`:""}</div>`;
+  if(v.collide) right=`<div class="collide"><span class="fake">${v.collide.fake}</span><span class="arrow">→</span><span class="real">${v.collide.real}</span><span class="stamp">${v.stamp||"FABRICATED"}</span></div>`;
+  else if(!v.hero&&v.stamp) right=`<div class="collide"><span class="stamp" style="background:var(--danger)">${v.stamp}</span></div>`;
+  let rc="";
+  if(v.receipt) rc=`<div class="receipt"><div class="rh">📋 RECEIPT — auditable</div><div class="rb">${v.receipt.map(([k,val])=>`<span class="k">${k}:</span> ${esc(val)}`).join("<br>")}</div><div class="sig">sig 3f9a…c71 · deps.dev ADVISORIES · reproducible from cache</div></div>`;
+  return {cls:v.kind, html:`<div class="vtop"><div class="vbadge">${esc(v.badge)}</div>${right}</div><div class="vsub">${v.sub}</div>${rc}`};
+}
+async function reveal(id,steps){
+  const box=$(id); box.classList.remove("center"); box.innerHTML="";
+  for(const st of steps){const el=stepEl(st); box.appendChild(el); await sleep(20); el.classList.add("show"); box.scrollTop=box.scrollHeight; await sleep(STEP);}
+}
+function deadend(id){const box=$(id); const d=document.createElement("div"); d.className="deadend"; d.style.opacity=0;
+  d.innerHTML=`— stopped —<div class="sub">0 evidence gathered · 0 queries · nothing to audit</div>`; box.appendChild(d);
+  requestAnimationFrame(()=>{d.style.transition="opacity .3s";d.style.opacity=1;}); box.scrollTop=box.scrollHeight;}
+async function showV(id,v){const box=$(id);const {cls,html}=verdictHTML(v);box.className="verdict "+cls;box.innerHTML=html;await sleep(20);box.classList.add("show");}
+function score(evs,foil){const calls=evs.filter(e=>["draft","execute"].includes(e.phase)).length;
+  return foil?`<div class="big">0</div><div class="cap">queries · guessed</div>`:`<div class="big">${calls}</div><div class="cap">real queries · verified</div>`;}
+function clearAll(){
+  $("ung").className="trace center"; $("gov").className="trace center";
+  $("ung").innerHTML='<div class="empty"><div class="big">Answers from memory.</div>running…</div>';
+  $("gov").innerHTML='<div class="empty"><div class="big">Gathers evidence, then decides.</div>running…</div>';
+  ["ungv","govv"].forEach(i=>{$(i).className="verdict";$(i).innerHTML="";}); $("ung-score").innerHTML="";$("gov-score").innerHTML="";}
+function pick(t){t=(t||"").toLowerCase();if(/commons|lang3/.test(t))return"commons-lang3";if(/moby|maintainer|contact/.test(t))return"moby";return"jackson";}
+async function run(key){
+  if(running)return; running=true; $("run").disabled=true; clearAll();
+  const sc=SCEN[key]; $("q").value=sc.q;
+  await reveal("ung",sc.ung.events); deadend("ung"); $("ung-score").innerHTML=score(sc.ung.events,true);
+  await sleep(GAP); await showV("ungv",sc.ung.verdict); $("ung").scrollTop=$("ung").scrollHeight; await sleep(GAP);
+  await reveal("gov",sc.gov.events); $("gov-score").innerHTML=score(sc.gov.events,false);
+  await sleep(GAP); await showV("govv",sc.gov.verdict);
+  // verdict docked → trace shrank; re-pin the gate + evidence into view just above the verdict
+  await sleep(30); $("gov").scrollTop=$("gov").scrollHeight;
+  running=false; $("run").disabled=false;
+}
+$("run").onclick=()=>run(pick($("q").value));
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{if(running)return;$("q").value=SCEN[c.dataset.k].q;run(c.dataset.k);});
+if(INSTANT){run(params.get("scenario")||"jackson");}
+</script>
+</body>
+</html>
