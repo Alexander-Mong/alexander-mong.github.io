@@ -172,7 +172,7 @@
           <div class="paper-card">
             <p>The code in this engine was written by AI coding agents. I wrote the system design, the module contracts, the test strategy, and the landing gate that every change has to pass before it is merged. When a change fails the gate, it does not land, whatever the agent's summary says about it.</p>
             <p>The gate has four parts. First, independent re-verification: a separate driver re-runs the whole suite rather than trusting the agent's report that it ran green. Second, a diff read: I read what changed, not the description of what changed. Third, a mutation-audit shard on every new test: the test is run against a deliberately broken version of the code it claims to cover, and a test that can't fail is treated as no test. Fourth, receipts: each landed change carries the commands that were run and their output, so a later reader can see what was checked.</p>
-            <p>Work runs in parallel across multiple agents, each in its own git worktree (a separate checkout of the same repo, so agents do not overwrite each other). External multi-model code review is part of the method too: on a sibling project, four frontier models produced 90 raw findings, 31 unique, 24 confirmed, and 20 were fixed, including a real secrets-on-disk defect the in-house checks had missed.</p>
+            <p>Work runs in parallel across multiple agents, each in its own git worktree (a separate checkout of the same repo, so agents do not overwrite each other). External multi-model code review is part of the method too: independent frontier models read the code cold, and their confirmed findings are fixed under the same gate as everything else.</p>
           </div>
           <div class="paper-card boundary">
             <h3>My role, and where it stops</h3>
@@ -225,11 +225,11 @@
         <div class="grid-2">
           <div class="paper-card">
             <h3>Where it is</h3>
-            <p>The engine's framing logic, the ledger, and the pricing path are built and test-covered, with the suite run fresh before anything on this page was written. The repo is private and the hosted build sits behind a gate while the interface gets its final pass; code and test runs can be shown on request. The <code>regulatory.ts</code> module classifies a building's likely permit and structural class; it labels for the human reading it, and a local code check still happens separately.</p>
+            <p>The engine's framing logic, the ledger, and the pricing path are built and test-covered, with the suite run fresh before anything on this page was written. The repo is private and the hosted build sits behind a gate; code and test runs can be shown on request. The <code>regulatory.ts</code> module classifies a building's likely permit and structural class; it labels for the human reading it, and a local code check still happens separately.</p>
           </div>
           <div class="paper-card">
             <h3>What's next</h3>
-            <p>The public demo, once the interface pass lands. A human QA pass over the quote-to-cash screens, which are built and test-covered but have not yet had eyes on every path. And the dealer platform the engine was built to carry: the same configure-to-cash spine, offered to the industry the first era served.</p>
+            <p>A public demo. And the dealer platform the engine was built to carry: the same configure-to-cash spine, offered to the industry the first era served.</p>
           </div>
         </div>
       </div>
