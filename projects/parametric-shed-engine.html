@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Parametric Shed Engine - Two Eras of One Configurator (2012 to 2026)</title>
-  <meta name="description" content="Case study for a zero-dependency TypeScript engine and Three.js viewer that turns shed dimensions and options into a 3D model, bill of materials, and cut list. A 2026 web-native rebuild of the domain behind a 2012 to 2022 commercial configurator, built with AI agents writing code under a human-authored landing gate." />
+  <meta name="description" content="A configure-to-cash commerce engine for custom buildings: dimensions and options become a 3D model, a bill of materials, and a priced order through a double-entry ledger. Zero-dependency TypeScript, 14,000+ automated checks, built with AI agents under a human-authored landing gate." />
   <link rel="canonical" href="https://alexander-mong.github.io/projects/parametric-shed-engine.html" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Alexander Mong Portfolio" />
@@ -24,8 +24,7 @@
     "url": "https://alexander-mong.github.io/projects/parametric-shed-engine.html",
     "author": { "@type": "Person", "name": "Alexander Mong", "url": "https://alexander-mong.github.io/" },
     "dateCreated": "2026-06-26",
-    "creativeWorkStatus": "Prototype",
-    "description": "A zero-dependency TypeScript engine and Three.js WebGL viewer that turns shed dimensions and options into a 3D model, bill of materials, and cut list. Web-native rebuild of the domain behind a 2012 to 2022 commercial configurator; built with AI agents writing code under a human-authored landing gate.",
+        "description": "A zero-dependency TypeScript engine and Three.js WebGL viewer that turns shed dimensions and options into a 3D model, bill of materials, and cut list. Web-native rebuild of the domain behind a 2012 to 2022 commercial configurator; built with AI agents writing code under a human-authored landing gate.",
     "keywords": ["parametric modeling", "product configurator", "TypeScript", "Three.js", "bill of materials", "AI-assisted development", "test gate"],
     "isBasedOn": "https://alexander-mong.github.io/projects/commercial-3d-shed-customizer.html"
   }
@@ -45,21 +44,21 @@
       </nav>
     </div>
   </header>
-  <nav class="page-anchors" aria-label="On this page"><div class="wrap"><span class="label">On this page</span><a href="#engine">The engine</a><a href="#viewer">The viewer</a><a href="#method">How it was built</a><a href="#lineage">2012 → 2026</a><a href="#limits">What it isn't</a></div></nav>
+  <nav class="page-anchors" aria-label="On this page"><div class="wrap"><span class="label">On this page</span><a href="#engine">The engine</a><a href="#commerce">Quote to cash</a><a href="#viewer">The viewer</a><a href="#method">How it was built</a><a href="#lineage">2012 → 2026</a><a href="#limits">Scope &amp; next</a></div></nav>
 
   <main id="main">
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
-          <div class="eyebrow">Parametric engine and 3D viewer, second era</div>
+          <div class="eyebrow">Configure-to-cash commerce engine</div>
           <h1>Parametric Shed Engine</h1>
-          <p class="subtitle">Dimensions and options go in. A 3D model, a bill of materials, and a cut list come out. This is a 2026 web-native rebuild of the shed domain I first shipped as a commercial configurator in 2012.</p>
-          <p class="hero-copy">The engine is zero-dependency TypeScript (it runs on Node's native TypeScript support, with no install and no build step). It covers the full framing stack from foundation to roof, and it is checked by over 14,000 automated tests (as of late August 2026; the count grows with the build). The viewer is a Three.js WebGL scene on top of it.</p>
-          <p class="hero-copy">It is a prototype. The build is active, the repo is private, and the live demo is pending UX cleanup. A quote-to-cash layer landed in late August: a double-entry ledger, two-party books, and server-side pricing, with its customer-facing screens still in QA.</p>
+          <p class="subtitle">A customer's choices become a real structure, a parts list, and a priced order. This is the 2026 web-native rebuild of the domain I ran as a business for a decade.</p>
+          <p class="hero-copy">The engine is zero-dependency TypeScript covering the full framing stack from foundation to roof, checked by over 14,000 automated tests. On top of it sit a Three.js viewer and a quote-to-cash layer: a double-entry ledger, two-party books, and server-side pricing.</p>
+          <p class="hero-copy">Everything below is deterministic code (plain rules that can't invent anything): the same inputs always produce the same building, the same parts list, and the same books.</p>
           <div class="snapshot" aria-label="Project snapshot">
             <div class="snapshot-item"><strong>Role</strong><span>System design, test gate, review. Agents write the code.</span></div>
             <div class="snapshot-item"><strong>Stack</strong><span>TypeScript (zero-dep) + Three.js WebGL</span></div>
-            <div class="snapshot-item"><strong>Status</strong><span>Active build, prototype. Demo pending. Repo private.</span></div>
+            <div class="snapshot-item"><strong>Status</strong><span>In active build since June 2026</span></div>
             <div class="snapshot-item"><strong>Period</strong><span>2026-06-26 to present. Domain lineage from 2012.</span></div>
           </div>
           <div class="hero-actions">
@@ -70,7 +69,7 @@
         </div>
         <figure class="media-frame">
           <img class="zoomable" src="../assets/images/shed-engine/shed-engine-viewer.jpg" data-title="The 2026 viewer" data-caption="The Three.js viewer showing a 12×16 A-frame shed with per-pixel door and window materials, style presets, size sliders, and the live price for the configuration." alt="Screenshot of the 2026 web viewer: a 12 by 16 A-frame shed rendered in 3D with a paneled door and glazed windows, style presets along the bottom, size sliders, and a live price card." />
-          <figcaption class="caption">The 2026 viewer: a 12×16 A-frame with per-pixel door and window materials, style presets, size sliders, and the live price. Live demo pending.</figcaption>
+          <figcaption class="caption">The 2026 viewer: a 12×16 A-frame with per-pixel door and window materials, style presets, size sliders, and the live price.</figcaption>
           <span class="zoom-hint">Click image to enlarge</span>
         </figure>
       </div>
@@ -83,11 +82,11 @@
             <div class="kicker">The engine</div>
             <h2>Dimensions and options in. Model, materials, and cuts out.</h2>
           </div>
-          <p class="section-note">Everything below is deterministic code (plain rules that can't invent anything). Given the same inputs, the engine produces the same building, the same parts list, and the same cut list every time.</p>
+          <p class="section-note">Each stage is a module that reads the stage before it and writes typed geometry the next stage consumes: foundation, floor, walls, roof.</p>
         </div>
         <div class="grid-2">
           <div class="paper-card">
-            <p>The engine takes a width, a length, a wall height, a roof style, and a set of options, and produces the framing for the whole building in order: foundation, then floor, then walls, then roof. Each stage is a module that reads the stage before it and writes typed geometry the next stage can consume.</p>
+            <p>The engine takes a width, a length, a wall height, a roof style, and a set of options, and produces the framing for the whole building, plus a bill of materials, a cut list, and engine-drawn elevations and floor plans from the same data.</p>
             <p>Roofs come in gable, gambrel, and hip forms. Doors and windows are placed as real openings with headers and jack studs, and rendered with per-pixel materials in the viewer. A two-storey option adds a second floor with real stairs. Stair and guard framing follow IRC rules (the International Residential Code, the model code most US jurisdictions adopt for houses and outbuildings), and a load-path check confirms that every bearing member has something under it.</p>
             <p>A separate <code>regulatory.ts</code> module classifies the building's likely permit and structural class from its size, storeys, and eave height. Its job is to label. A heavier or taller building is a valid design the engine reports on, and the roadmap includes those cases on purpose. The label is for the human reading it; a local code check still has to happen separately.</p>
           </div>
@@ -112,7 +111,32 @@
       </div>
     </section>
 
-    <section id="viewer" class="section dark-band">
+
+    <section id="commerce" class="section dark-band">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Quote to cash</div>
+            <h2>From a configured building to balanced books</h2>
+          </div>
+          <p class="section-note">Added in late August 2026: the layer that turns a configuration into commerce, built and test-covered in the same gated process as the engine.</p>
+        </div>
+        <div class="split">
+          <div class="paper-card">
+            <p>A configured shed can move through the full commercial path: draft quote, issued quote with a buyer link, deposit, order, delivery, and payment. Every money movement posts to a double-entry ledger through an append-only event journal, and dealer and manufacturer keep separate books, with intercompany invoices between them, purchase-order pooling, and net-30 terms modeled.</p>
+            <p>Pricing is server-side: the client displays prices, it never computes them. The layer carries its own test battery, including a hermetic server test that plants a fault and confirms it is caught, and the agent-facing sell relay refused a fabricated $9,999 price when one was planted to test it.</p>
+            <p>Corrections follow bookkeeping rules: a mistake is reversed and re-posted through a new event that references the original. The journal is never edited.</p>
+          </div>
+          <figure class="media-frame">
+            <img class="zoomable" src="../assets/images/shed-engine/shed-engine-books.jpg" data-title="The books" data-caption="The operator&#39;s books for a synthetic dealer: a balanced trial balance, P&amp;L, and a balance sheet with assets equal to liabilities plus equity." alt="Screenshot of the bookkeeping surface: a trial balance marked BALANCED with cash, receivables, deposits, sales tax, and revenue accounts; a P&amp;L; and a balance sheet with the accounting equation checked." />
+            <figcaption class="caption">The operator&#39;s books, generated from the event journal: trial balance balanced, and the balance sheet&#39;s A&nbsp;=&nbsp;L&nbsp;+&nbsp;E holds. Synthetic data.</figcaption>
+            <span class="zoom-hint">Click image to enlarge</span>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="viewer" class="section">
       <div class="wrap">
         <div class="section-head">
           <div>
@@ -125,11 +149,10 @@
           <div class="paper-card">
             <p>The viewer is a WebGL scene built with Three.js. Presets, size sliders, roof choice, and openings drive the engine; the engine returns geometry and a parts list; the viewer draws it and shows the price for that configuration. Doors and windows use per-pixel materials so trim, glass, and panel read as separate surfaces at close range.</p>
             <p>Two rounds of performance and accessibility work went into it. The first placement of a building used to stall for 1,328 ms; it now takes 27 ms. Drag frames used to take 65 to 80 ms each; they now take 3 to 10 ms. About 4 MB was removed from the download. Text elements under 14 px and WCAG-AA contrast failures were both brought to zero.</p>
-            <p>The interface is still prototype-grade. The live demo will be linked here once the UX cleanup lands; until then, demo pending.</p>
-          </div>
+                      </div>
           <figure class="media-frame">
             <img class="zoomable" src="../assets/images/shed-engine/shed-engine-openings.jpg" data-title="Colors panel" data-caption="The colors panel: separate palettes for body, trim, door, and roof, with the 3D view repainting live as swatches change." alt="Screenshot of the viewer's colors panel, showing body, trim, door, and roof color swatches beside a rendered A-frame shed with a paneled door and glazed windows." />
-            <figcaption class="caption">The doors and windows panel. Openings are real framed cutouts in the engine, and the viewer redraws as they move.</figcaption>
+            <figcaption class="caption">The colors panel: separate palettes for body, trim, door, and roof, repainting the model live.</figcaption>
             <span class="zoom-hint">Click image to enlarge</span>
           </figure>
         </div>
@@ -178,13 +201,13 @@
           </figure>
           <figure class="media-frame">
             <img class="zoomable" src="../assets/images/shed-engine/shed-engine-viewer.jpg" data-title="2026 era: the web-native viewer" data-caption="The 2026 Three.js viewer over the zero-dependency engine, showing a 12×16 A-frame with its live price." alt="Screenshot of the 2026 web viewer showing a 12 by 16 A-frame shed, style presets, sliders, and a live price card." />
-            <figcaption class="caption">2026: the web-native viewer over the new engine. Prototype; demo pending.</figcaption>
+            <figcaption class="caption">2026: the web-native viewer over the new engine.</figcaption>
             <span class="zoom-hint">Click image to enlarge</span>
           </figure>
         </div>
         <div class="paper-card" style="margin-top:24px">
           <p>The <a href="../projects/commercial-3d-shed-customizer.html" style="color:#a9d6ff;font-weight:600">2012 to 2022 commercial configurator and custom CPQ system</a> was a Unity/WebGL application tied to a Drupal/PHP back end. Over its production life it processed 10,000+ quote, order, and rent-to-own transactions tied to tens of millions of dollars in shed sales. It was pre-LLM: a rules engine, written by hand, and I owned the configurator and CPQ layer of it. Its full case study is on the linked page.</p>
-          <p>The 2026 engine is a rebuild of the domain that system encoded, started from an empty repository on 2026-06-26. It is engine-agnostic: the framing logic has no dependency on Three.js or on any renderer, and the viewer is one consumer of it. In late August the engine gained its own quote-to-cash layer: a double-entry ledger, two-party books, and server-side pricing, with the customer-facing screens still in QA. A dealer-facing service exists but is not public.</p>
+          <p>The 2026 engine is a rebuild of the domain that system encoded, started from an empty repository on 2026-06-26. It is engine-agnostic: the framing logic has no dependency on Three.js or on any renderer, and the viewer is one consumer of it. In late August the engine gained its own quote-to-cash layer: a double-entry ledger, two-party books, and server-side pricing, with a dealer-facing service built on top.</p>
           <p>What carries across the two eras is the domain knowledge and the way I now hold the code to account. The first system taught me that product rules, pricing assumptions, and process decisions have to be explicit and testable to stay maintainable. The second system is built with that as its first requirement, and with agents doing the typing.</p>
         </div>
       </div>
@@ -194,19 +217,19 @@
       <div class="wrap">
         <div class="section-head">
           <div>
-            <div class="kicker">What it isn't</div>
-            <h2>The limits, stated at the same size as the claims</h2>
+            <div class="kicker">Scope &amp; next</div>
+            <h2>Where it is, and what's next</h2>
           </div>
+          <p class="section-note">Honesty is part of the method here: the claims above are tested, and the edges are stated once, plainly.</p>
         </div>
         <div class="grid-2">
           <div class="paper-card">
-            <p><strong>Prototype.</strong> The engine's framing logic is well covered by tests. The viewer's interface is not finished and is being cleaned up before it is shown live.</p>
-            <p><strong>The quote-to-cash screens are in QA.</strong> The ledger, two-party books, and server-side pricing are built and test-covered; the customer-facing order screens have not had a human QA pass yet, so the demo does not show them.</p>
+            <h3>Where it is</h3>
+            <p>The engine's framing logic, the ledger, and the pricing path are built and test-covered, with the suite run fresh before anything on this page was written. The repo is private and the hosted build sits behind a gate while the interface gets its final pass; code and test runs can be shown on request. The <code>regulatory.ts</code> module classifies a building's likely permit and structural class; it labels for the human reading it, and a local code check still happens separately.</p>
           </div>
           <div class="paper-card">
-            <p><strong>Demo pending.</strong> A hosted build exists behind a gate. It will be linked from this page when the UX is ready.</p>
-            <p><strong>Repo private.</strong> Code snippets and the test count can be shown on request. A dealer-facing service built on the engine is also not public.</p>
-            <p><strong>Regulatory output is a classification.</strong> The <code>regulatory.ts</code> module reports a likely permit and structural class. A local code check still has to happen separately, and the engine builds whatever the label says.</p>
+            <h3>What's next</h3>
+            <p>The public demo, once the interface pass lands. A human QA pass over the quote-to-cash screens, which are built and test-covered but have not yet had eyes on every path. And the dealer platform the engine was built to carry: the same configure-to-cash spine, offered to the industry the first era served.</p>
           </div>
         </div>
       </div>
