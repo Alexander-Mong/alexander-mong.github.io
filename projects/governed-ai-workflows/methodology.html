@@ -38,7 +38,7 @@
   .eg { border-left:3px solid var(--line); padding:2px 0 2px 16px; margin:0 0 16px; }
   .eg .row { margin:0 0 9px; } .eg .row:last-child { margin:0; }
   .eg .tag { display:block; font-size:11.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--faint); margin-bottom:2px; }
-  .eg q { color:var(--ink); font-style:italic; }
+  .eg q { color:var(--ink); font-style:italic; quotes:"“" "”"; }
   .bars { margin:16px 0 8px; max-width:520px; }
   .bar { margin:0 0 13px; }
   .bar .lab { display:flex; justify-content:space-between; align-items:baseline; font-size:13.5px; color:var(--muted); margin-bottom:6px; }
@@ -53,9 +53,15 @@
   .next a { color:var(--cobalt); font-weight:650; font-size:15.5px; text-decoration:none; border-bottom:1px solid transparent; }
   .next a:hover { border-bottom-color:var(--cobalt); }
   footer { max-width:680px; margin:0 auto; padding:8px 24px 72px; color:var(--faint); font-size:13px; }
+  /* minimal home bar */
+  .am-bar { max-width:680px; margin:0 auto; padding:10px 24px; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:13px; line-height:1.4; border-bottom:1px solid var(--line); }
+  .am-bar a { color:var(--cobalt); text-decoration:none; font-weight:600; }
+  .am-bar a:hover { text-decoration:underline; }
+  .am-bar nav { flex:1; }
 </style>
 </head>
 <body>
+<div class="am-bar"><a class="am-home" href="../../index.html">&larr; Alexander Mong</a><nav></nav><a class="am-contact" href="../../index.html#contact">Contact</a></div>
 <main>
   <nav aria-label="Governed AI Workflows section" style="margin:0 0 22px;font-size:13px;font-weight:600;line-height:1.9">
     <a href="../../tech-week-advice.html" style="color:#2747D6;text-decoration:none">&larr; Advice &amp; predictions</a><span style="color:#C9CCCF;margin:0 9px">&middot;</span><span style="color:#6A7079">The method</span>
@@ -85,8 +91,8 @@
   (a rule that grabs number- and quantity-spans, never real advice), and ran 122 of its items through the
   judge. The junk looked like this:</p>
   <div class="eg">
-    <div class="row"><q>“they take about nine months to complete.”</q></div>
-    <div class="row"><q>“roughly a million tokens in its context limit.”</q></div>
+    <div class="row"><q>they take about nine months to complete.</q></div>
+    <div class="row"><q>roughly a million tokens in its context limit.</q></div>
   </div>
   <p>It accepted 3. Looking at them, the generator had accidentally grabbed real advice (e.g. <em>“Don’t
   show someone 10 things and ask them to pick no more than three.”</em>), so those 3 were arguably
@@ -112,8 +118,8 @@
   <h2>The hard part: is it actually useful?</h2>
   <p>Telling whether something is advice is easier than telling whether it’s any good:</p>
   <div class="eg">
-    <div class="row"><span class="tag">Genuinely useful</span><q>“the most underrated skill for founders is the skill to learn skills.”</q></div>
-    <div class="row"><span class="tag">Passes the filter, but empty</span><q>“So don’t do that.”</q> is grammatically advice, but means nothing on its own.</div>
+    <div class="row"><span class="tag">Genuinely useful</span><q>the most underrated skill for founders is the skill to learn skills.</q></div>
+    <div class="row"><span class="tag">Passes the filter, but empty</span><q>So don’t do that.</q> is grammatically advice, but means nothing on its own.</div>
   </div>
   <p>So I tried to grade usefulness, and this is where it broke. The clearly-low-value items separated
   cleanly from the strong ones across repeated blind passes, but ranking the ambiguous middle didn’t hold:
